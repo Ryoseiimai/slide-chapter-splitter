@@ -164,6 +164,16 @@
   </div>
 </header>
 
+<section id="now-status">
+  <div class="wrap">
+    <h2>現在地</h2>
+    <div class="info-box">
+      <p style="margin:0;">りょうすけさんのCodexが、すでにGoogleスライド全339枚を読み込み、章別PDF15本と、VREW用の動画台本93本（章単位の一括台本20本も含む）まで作っています。台本コンソールや検品レポートも出来ています。</p>
+      <p class="note">この資料の「①1章を試す」「②全章まとめて」は、もう終わっています。次にやることは「③読み上げの誤読をゼロにする」と「④VREWで動画を完成させる」です。</p>
+    </div>
+  </div>
+</section>
+
 <section id="compare">
   <div class="wrap">
     <h2>今と、自動化したあと</h2>
@@ -207,11 +217,11 @@
 
 <section id="stages">
   <div class="wrap">
-    <h2>進め方は3段階</h2>
+    <h2>進め方は5段階</h2>
 
     <div class="stage-card">
       <span class="stage-num">①</span>
-      <h3>1章だけ試す</h3>
+      <h3>1章だけ試す（済）</h3>
       <div class="stage-row"><span class="label">あなたがやること：</span>スライドPDFを渡し、質問に答える</div>
       <div class="stage-row"><span class="label">AIがやること：</span>1章分だけ、章のPDFと台本の下書きを1本作る</div>
       <div class="stage-row"><span class="label">次へ進む目安：</span>その台本を読んで「このまま使える」「直せば使える」と思えたら次へ</div>
@@ -219,7 +229,7 @@
 
     <div class="stage-card">
       <span class="stage-num">②</span>
-      <h3>全章まとめて</h3>
+      <h3>全章まとめて（済）</h3>
       <div class="stage-row"><span class="label">あなたがやること：</span>章の区切りの一覧を確認し、違っていたら直す</div>
       <div class="stage-row"><span class="label">AIがやること：</span>すべての章のPDFと台本の下書きを作る(量が多ければ数章ずつ)</div>
       <div class="stage-row"><span class="label">次へ進む目安：</span>出来た台本を何本か開いて、狙いどおりの文体・長さになっていたら次へ</div>
@@ -227,10 +237,26 @@
 
     <div class="stage-card">
       <span class="stage-num">③</span>
-      <h3>一言で動く形にする</h3>
-      <div class="stage-row"><span class="label">あなたがやること：</span>新しい会話で、決めた一言で実際に頼んでみる</div>
-      <div class="stage-row"><span class="label">AIがやること：</span>その一言だけで、①②の流れを最初から動かす</div>
-      <div class="stage-row"><span class="label">次へ進む目安：</span>説明なしの一言で、いつもどおりの形が出来上がったら完了</div>
+      <h3>読み上げを安全にする（誤読ゼロ＝100点）</h3>
+      <div class="stage-row"><span class="label">あなたがやること：</span>誤読チェッカーに台本を貼って読み上げ用に変換し、VREWで数本聴いてみる</div>
+      <div class="stage-row"><span class="label">AIがやること：</span>誤読しやすい語（「STEP1」など英字＋数字、略語、記号）を読み上げ表記に置き換える。聴いて見つかった誤読は辞書に追加して再変換する</div>
+      <div class="stage-row"><span class="label">次へ進む目安：</span>実際に聴いて、直したい語がもう出てこなくなったら次へ</div>
+    </div>
+
+    <div class="stage-card">
+      <span class="stage-num">④</span>
+      <h3>VREWに投入して試聴する</h3>
+      <div class="stage-row"><span class="label">あなたがやること：</span>読み上げ用の台本をVREWに貼り、声・速度・字幕の設定を決める（この操作は人が行います）</div>
+      <div class="stage-row"><span class="label">AIがやること：</span>1本目の設定が決まったら、以降も同じ設定で流せるように、読み上げ用台本をすべて揃えておく</div>
+      <div class="stage-row"><span class="label">次へ進む目安：</span>1本目の声・速度・字幕の設定が決まったら次へ</div>
+    </div>
+
+    <div class="stage-card">
+      <span class="stage-num">⑤</span>
+      <h3>全本の最終視聴（120点＝お客さんに出せる）</h3>
+      <div class="stage-row"><span class="label">あなたがやること：</span>出来上がった動画を全本、実際に見て聴く</div>
+      <div class="stage-row"><span class="label">AIがやること：</span>言い間違いや設定のばらつきが見つかった箇所を直す</div>
+      <div class="stage-row"><span class="label">次へ進む目安：</span>言い間違いがゼロで、そのままお客さんに出せると思えたら完了</div>
     </div>
   </div>
 </section>
@@ -263,7 +289,7 @@
     <h2>全自動になっても、人がやること</h2>
     <ul class="plain">
       <li>出来上がった台本の最終チェック(内容が正しいか、実際に使える言い回しか)</li>
-      <li>配信システムや読み上げ先に、台本を実際に入れる作業</li>
+      <li>VREWの操作（台本を貼り付けて動画として書き出す作業）。私が確認した範囲では、VREWに外部から自動で台本を流し込む公開された手段は見当たらないため、この部分は人が行います</li>
       <li>受講生の名前や事例が写っているスライドを、AIに渡してよいかの判断</li>
     </ul>
   </div>
@@ -276,6 +302,8 @@
       <li>台本の質は、AIへの頼み方で決まります。1章目で「こういう話し方で」「この長さで」と文体を決めるのが一番の肝です</li>
       <li>スライドが画像として貼り付けられているだけのPDFは、文字を読み取れないことがあります</li>
       <li>クラウドのAIサービスを使う場合、スライドの内容がそのサービスに送られます</li>
+      <li>誤読は声の種類によって変わります。声を変えたら1本目を必ず聴き直してください</li>
+      <li>章配置が食い違うスライド5枚（122・126・130・135・179）は、台本を作る前にどちらの章に置くか本人が確定してください</li>
     </ul>
   </div>
 </section>

@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VREW誤読チェッカー</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent:#1a56db;
+    --ink:#111111;
+    --line:#dddddd;
+    --bg-soft:#f7f7f8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Noto Sans JP", sans-serif;
+    color:var(--ink);
+    background:#ffffff;
+    font-size:16px;
+    line-height:1.7;
+  }
+  .wrap{
+    max-width:1200px;
+    margin:0 auto;
+    padding:24px 20px 80px;
+  }
+  header h1{
+    font-size:22px;
+    margin:0 0 12px;
+  }
+  .steps{
+    background:var(--bg-soft);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:14px 18px;
+    margin-bottom:20px;
+  }
+  .steps p{margin:4px 0;}
+  .steps b{color:var(--accent);}
+  .cols{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:24px;
+  }
+  @media (max-width:900px){
+    .cols{grid-template-columns:1fr;}
+  }
+  section.card{
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:16px;
+    margin-bottom:20px;
+  }
+  h2{font-size:16px; margin:0 0 10px;}
+  textarea{
+    width:100%;
+    min-height:260px;
+    font-size:16px;
+    font-family:"Noto Sans JP", sans-serif;
+    padding:10px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    resize:vertical;
+  }
+  .row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:10px;
+    align-items:center;
+  }
+  button, .filebtn{
+    font-size:15px;
+    padding:8px 16px;
+    border-radius:6px;
+    border:1px solid var(--accent);
+    background:#ffffff;
+    color:var(--accent);
+    cursor:pointer;
+  }
+  button.primary{
+    background:var(--accent);
+    color:#ffffff;
+  }
+  button:hover, .filebtn:hover{opacity:0.85;}
+  input[type=file]{display:none;}
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:15px;
+    margin-top:12px;
+  }
+  th, td{
+    border:1px solid var(--line);
+    padding:6px 8px;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{background:var(--bg-soft);}
+  mark{
+    background:none;
+    color:inherit;
+    border-bottom:2px solid var(--accent);
+  }
+  mark.check{
+    background:none;
+    color:inherit;
+    border-bottom:2px dotted var(--accent);
+  }
+  .preview{
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:12px;
+    max-height:300px;
+    overflow:auto;
+    white-space:pre-wrap;
+    font-size:16px;
+  }
+  .note{
+    font-size:14px;
+    color:#555555;
+    margin-top:6px;
+  }
+  footer.notice{
+    margin-top:30px;
+    background:var(--bg-soft);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:14px 18px;
+    font-size:14px;
+    color:#333333;
+  }
+  .badge{
+    display:inline-block;
+    font-size:12px;
+    padding:2px 6px;
+    border-radius:4px;
+    border:1px solid var(--accent);
+    color:var(--accent);
+  }
+  .dict-table input{
+    width:100%;
+    font-size:14px;
+    padding:4px 6px;
+    border:1px solid var(--line);
+    border-radius:4px;
+  }
+  .small{font-size:13px;color:#555;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>VREW誤読チェッカー</h1>
+  <div class="steps">
+    <p><b>1</b> 台本を貼る　<b>2</b> チェックする　<b>3</b> 読み上げ用テキストをコピーしてVREWへ</p>
+  </div>
+</header>
+
+<div class="cols">
+  <section class="card">
+    <h2>台本</h2>
+    <textarea id="inputText" placeholder="ここに台本を貼り付けてください"></textarea>
+    <div class="row">
+      <label class="filebtn">ファイルを読み込む(.txt/.md 複数可)
+        <input type="file" id="fileInput" accept=".txt,.md" multiple>
+      </label>
+      <button class="primary" id="checkBtn">チェックする</button>
+      <span class="small" id="fileNote"></span>
+    </div>
+    <div class="row" style="margin-top:14px;flex-direction:column;align-items:flex-start;">
+      <label for="watermarkWords" class="small">消す語（透かし・ヘッダー用、カンマ区切り）：この語を含む行はまるごと削除します</label>
+      <input type="text" id="watermarkWords" style="width:100%;font-size:14px;padding:6px 8px;border:1px solid var(--line);border-radius:4px;" value="CONFIDENTIAL">
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>誤読候補ハイライト</h2>
+    <div class="preview" id="highlightPreview">チェックするとここにハイライト表示されます。</div>
+    <p class="note">実線下線＝置換候補／点線下線＝要確認（自動置換しません）</p>
+  </section>
+</div>
+
+<section class="card">
+  <h2>候補一覧</h2>
+  <table id="resultTable">
+    <thead>
+      <tr><th>元の表記</th><th>提案する読み上げ表記</th><th>種類</th><th>件数</th><th>置換する</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <p class="small" id="noResultMsg" style="display:none;">誤読候補は見つかりませんでした。</p>
+</section>
+
+<div class="cols">
+  <section class="card">
+    <h2>読み上げ用テキスト</h2>
+    <textarea id="outputText" readonly></textarea>
+    <div class="row">
+      <button id="copyOutputBtn">コピー</button>
+      <button id="saveOutputBtn">.txtで保存</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>読み上げ確認メモ</h2>
+    <textarea id="memoText" readonly></textarea>
+    <div class="row">
+      <button id="copyMemoBtn">コピー</button>
+    </div>
+  </section>
+</div>
+
+<section class="card">
+  <h2>辞書を編集 <span class="badge">保存はこの端末のみ</span></h2>
+  <table class="dict-table" id="dictTable">
+    <thead><tr><th style="width:35%">英字表記</th><th style="width:50%">読み上げ表記</th><th style="width:15%">操作</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <div class="row">
+    <button id="addDictRow">行を追加</button>
+    <button id="resetDict">初期値に戻す</button>
+    <span class="small">辞書はブラウザに保存され、チェック時に反映されます。</span>
+  </div>
+</section>
+
+<footer class="notice">
+  <p>このツールはブラウザの中だけで動作し、入力した台本や辞書のデータは外部に送信されません（サーバー通信を行いません）。</p>
+  <p>VREWの声の種類により読みは変わります。「要確認」の語は実際に聴いて判断してください。</p>
+</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var DICT_STORAGE_KEY = "yomiage_dict_v1";
+  var WATERMARK_STORAGE_KEY = "yomiage_watermark_v1";
+  var DEFAULT_WATERMARK_WORDS = "CONFIDENTIAL";
+
+  var DEFAULT_DICT = [
+    ["AI","エーアイ"],["SNS","エスエヌエス"],["PDF","ピーディーエフ"],["SEO","エスイーオー"],
+    ["LP","エルピー"],["CV","シーブイ"],["KPI","ケーピーアイ"],["ROI","アールオーアイ"],
+    ["BtoB","ビートゥービー"],["BtoC","ビートゥーシー"],["ToC","トゥーシー"],["ToB","トゥービー"],
+    ["DM","ディーエム"],["LINE","ライン"],["YouTube","ユーチューブ"],["Instagram","インスタグラム"],
+    ["X","エックス"],["VREW","ブリュー"],["UTAGE","ウタゲ"],["ChatGPT","チャットジーピーティー"],
+    ["Google","グーグル"],["Zoom","ズーム"],["Excel","エクセル"],["Word","ワード"],
+    ["PowerPoint","パワーポイント"],["Canva","キャンバ"],["Notion","ノーション"],["Slack","スラック"],
+    ["URL","ユーアールエル"],["OK","オーケー"],["NG","エヌジー"],["FAQ","エフエーキュー"],
+    ["MTG","ミーティング"],["PC","パソコン"],["Mac","マック"],["iPhone","アイフォン"],
+    ["Web","ウェブ"],["HP","ホームページ"],["ID","アイディー"],["PW","パスワード"],
+    ["No.","ナンバー"],["vs","対"],["％","パーセント"],["＆","アンド"]
+  ];
+
+  // 「X」は単独の大文字Xのみ変換対象（英単語中のxは対象外）。マッチ時に単語境界を見て判定する。
+  var SINGLE_X_KEY = "X";
+
+  function loadDict(){
+    try{
+      var raw = localStorage.getItem(DICT_STORAGE_KEY);
+      if(raw){
+        var parsed = JSON.parse(raw);
+        if(Array.isArray(parsed) && parsed.length){ return parsed; }
+      }
+    }catch(e){}
+    return DEFAULT_DICT.slice().map(function(p){return p.slice();});
+  }
+  function saveDict(dict){
+    localStorage.setItem(DICT_STORAGE_KEY, JSON.stringify(dict));
+  }
+
+  var currentDict = loadDict();
+
+  // ---------- 消す語（透かし・ヘッダー用） ----------
+  var watermarkInput = document.getElementById("watermarkWords");
+  (function(){
+    try{
+      var saved = localStorage.getItem(WATERMARK_STORAGE_KEY);
+      watermarkInput.value = (saved !== null) ? saved : DEFAULT_WATERMARK_WORDS;
+    }catch(e){
+      watermarkInput.value = DEFAULT_WATERMARK_WORDS;
+    }
+  })();
+  watermarkInput.addEventListener("change", function(){
+    try{ localStorage.setItem(WATERMARK_STORAGE_KEY, watermarkInput.value); }catch(e){}
+  });
+
+  function getWatermarkWords(){
+    return watermarkInput.value.split(",")
+      .map(function(w){ return w.trim(); })
+      .filter(function(w){ return w.length; });
+  }
+
+  // 消す語を含む行をまるごと削除する。他ルールより先に適用する。
+  // 戻り値: {text: 削除後のテキスト, removedCount: 削除した行数}
+  function removeWatermarkLines(text, words){
+    if(!words.length) return { text: text, removedCount: 0 };
+    var lines = text.split("\n");
+    var removedCount = 0;
+    var kept = lines.filter(function(line){
+      var hit = words.some(function(w){ return w.length && line.indexOf(w) !== -1; });
+      if(hit) removedCount++;
+      return !hit;
+    });
+    return { text: kept.join("\n"), removedCount: removedCount };
+  }
+
+  // ---------- 辞書編集UI ----------
+  var dictTableBody = document.querySelector("#dictTable tbody");
+
+  function renderDictTable(){
+    dictTableBody.innerHTML = "";
+    currentDict.forEach(function(pair, idx){
+      var tr = document.createElement("tr");
+
+      var tdFrom = document.createElement("td");
+      var inFrom = document.createElement("input");
+      inFrom.value = pair[0];
+      inFrom.addEventListener("change", function(){
+        currentDict[idx][0] = inFrom.value;
+        saveDict(currentDict);
+      });
+      tdFrom.appendChild(inFrom);
+
+      var tdTo = document.createElement("td");
+      var inTo = document.createElement("input");
+      inTo.value = pair[1];
+      inTo.addEventListener("change", function(){
+        currentDict[idx][1] = inTo.value;
+        saveDict(currentDict);
+      });
+      tdTo.appendChild(inTo);
+
+      var tdOp = document.createElement("td");
+      var delBtn = document.createElement("button");
+      delBtn.textContent = "削除";
+      delBtn.addEventListener("click", function(){
+        currentDict.splice(idx,1);
+        saveDict(currentDict);
+        renderDictTable();
+      });
+      tdOp.appendChild(delBtn);
+
+      tr.appendChild(tdFrom);
+      tr.appendChild(tdTo);
+      tr.appendChild(tdOp);
+      dictTableBody.appendChild(tr);
+    });
+  }
+  renderDictTable();
+
+  document.getElementById("addDictRow").addEventListener("click", function(){
+    currentDict.push(["",""]);
+    saveDict(currentDict);
+    renderDictTable();
+  });
+  document.getElementById("resetDict").addEventListener("click", function(){
+    currentDict = DEFAULT_DICT.slice().map(function(p){return p.slice();});
+    saveDict(currentDict);
+    renderDictTable();
+  });
+
+  // ---------- ファイル読み込み ----------
+  var inputText = document.getElementById("inputText");
+  var fileInput = document.getElementById("fileInput");
+  var fileNote = document.getElementById("fileNote");
+
+  fileInput.addEventListener("change", function(){
+    var files = Array.prototype.slice.call(fileInput.files);
+    if(!files.length) return;
+    var readers = files.map(function(f){
+      return new Promise(function(resolve){
+        var r = new FileReader();
+        r.onload = function(){ resolve({name:f.name, text:r.result}); };
+        r.readAsText(f, "UTF-8");
+      });
+    });
+    Promise.all(readers).then(function(results){
+      var combined = results.map(function(r){
+        return "----- " + r.name + " -----\n" + r.text;
+      }).join("\n\n");
+      if(inputText.value.trim().length){
+        inputText.value = inputText.value + "\n\n" + combined;
+      }else{
+        inputText.value = combined;
+      }
+      fileNote.textContent = results.length + "件のファイルを読み込みました。";
+    });
+  });
+
+  // ---------- 検出ルール ----------
+  // 種類: "replace"(既定ON) / "check"(既定OFF・置換しない)
+
+  var HALFWIDTH_DIGITS = "0-9０-９";
+
+  function toHalfWidthDigits(s){
+    return s.replace(/[０-９]/g, function(c){
+      return String.fromCharCode(c.charCodeAt(0) - 0xFEE0);
+    });
+  }
+  function digitsToKanjiNumber(numStr){
+    // 単純な数値文字列をそのままアラビア数字として提案文に使う（複雑な漢数字変換はしない）
+    var n = parseInt(toHalfWidthDigits(numStr), 10);
+    return isNaN(n) ? numStr : String(n);
+  }
+
+  // 候補を集約するための構造: key -> {from, to, type, count, defaultOn}
+  function addCandidate(map, from, to, type, defaultOn){
+    var key = from + "" + type;
+    if(!map[key]){
+      map[key] = {from: from, to: to, type: type, count: 0, defaultOn: defaultOn};
+    }
+    map[key].count += 1;
+  }
+
+  function buildAbbrevRegex(dict){
+    // 長い語から先にマッチさせるため長さ降順にソート
+    var sorted = dict.filter(function(p){ return p[0] && p[0].length; })
+      .slice().sort(function(a,b){ return b[0].length - a[0].length; });
+    var escaped = sorted.map(function(p){
+      return p[0].replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    });
+    if(!escaped.length) return null;
+    return {
+      regex: new RegExp("(?:^|(?<=[^A-Za-z0-9]))(" + escaped.join("|") + ")(?=$|[^A-Za-z0-9])", "g"),
+      map: sorted
+    };
+  }
+
+  function rangesOverlap(a, b){
+    return a.start < b.end && b.start < a.end;
+  }
+
+  function detectAll(text, dict){
+    var candidates = {}; // key -> candidate info
+    var highlightSpans = []; // {start, end, type}
+    var coveredRanges = []; // 既に別ルールで検出済みの範囲（英字語の重複検出を避けるため）
+
+    // 1) 英字＋数字の型
+    var patterns = [
+      { re: /(?:STEP|Step|step)\s*０?([0-9０-９]{1,2})/g, label: function(m){ return "ステップ" + digitsToKanjiNumber(m[1]); }},
+      { re: /(?:Chapter|CHAPTER|chapter)\s*([0-9０-９]{1,2})/g, label: function(m){ return "第" + digitsToKanjiNumber(m[1]) + "章"; }},
+      { re: /(?:Lesson|LESSON|lesson)\s*([0-9０-９]{1,2})/g, label: function(m){ return "レッスン" + digitsToKanjiNumber(m[1]); }},
+      { re: /(?:Part|PART|part)\s*([0-9０-９]{1,2})/g, label: function(m){ return "パート" + digitsToKanjiNumber(m[1]); }},
+      { re: /(?:Day|DAY|day)\s*([0-9０-９]{1,2})/g, label: function(m){ return "デイ" + digitsToKanjiNumber(m[1]); }},
+      { re: /Q&A/g, label: function(){ return "キューアンドエー"; }},
+      { re: /Q([0-9０-９])/g, label: function(m){ return "キュー" + digitsToKanjiNumber(m[1]); }}
+    ];
+    patterns.forEach(function(p){
+      var m;
+      p.re.lastIndex = 0;
+      while((m = p.re.exec(text)) !== null){
+        var from = m[0];
+        var to = p.label(m);
+        addCandidate(candidates, from, to, "replace", true);
+        var range = {start:m.index, end:m.index+from.length};
+        highlightSpans.push({start:range.start, end:range.end, type:"replace"});
+        coveredRanges.push(range);
+      }
+    });
+
+    // 2) 英大文字略語（辞書）
+    var built = buildAbbrevRegex(dict);
+    if(built){
+      var m2;
+      built.regex.lastIndex = 0;
+      while((m2 = built.regex.exec(text)) !== null){
+        var word = m2[1];
+        // Xは単独の大文字Xのみ対象（すでに単語境界で区切られているのでそのまま可）
+        var toVal = null;
+        for(var i=0;i<built.map.length;i++){
+          if(built.map[i][0] === word){ toVal = built.map[i][1]; break; }
+        }
+        if(toVal === null || toVal === "") continue;
+        addCandidate(candidates, word, toVal, "replace", true);
+        var range2 = {start:m2.index, end:m2.index+word.length};
+        highlightSpans.push({start:range2.start, end:range2.end, type:"replace"});
+        coveredRanges.push(range2);
+      }
+    }
+
+    // 2b) 辞書に無い英字語（2文字以上の英字のみの語）→ 要確認
+    //     すでに1)/2)で検出済みの範囲と重なる語（例: STEP1のSTEP部分）は二重検出しない
+    var knownWords = {};
+    dict.forEach(function(p){ if(p[0]) knownWords[p[0]] = true; });
+    var stepWords = ["STEP","Step","step","Chapter","CHAPTER","chapter","Lesson","LESSON","lesson","Part","PART","part","Day","DAY","day"];
+    var reEnglishWord = /(?:^|(?<=[^A-Za-z]))[A-Za-z]{2,}(?:[A-Za-z0-9]*)(?=$|[^A-Za-z])/g;
+    var m3;
+    reEnglishWord.lastIndex = 0;
+    while((m3 = reEnglishWord.exec(text)) !== null){
+      var w = m3[0];
+      if(knownWords[w]) continue;
+      if(stepWords.indexOf(w) !== -1) continue;
+      var wRange = {start:m3.index, end:m3.index+w.length};
+      if(coveredRanges.some(function(r){ return rangesOverlap(r, wRange); })) continue;
+      addCandidate(candidates, w, "", "check", false);
+      highlightSpans.push({start:wRange.start, end:wRange.end, type:"check"});
+    }
+
+    // 3) 数字＋単位: 要確認になるもの
+    var checkNumberPatterns = [
+      { re: /([0-9０-９]{1,2})日(?!間)/g, note: function(m){
+          var n = toHalfWidthDigits(m[1]);
+          if(n === "1") return "ついたち／いちにち";
+          return "「" + m[0] + "」の読み（ようか/はつか等）";
+        }},
+      { re: /([0-9０-９])人(?!数)/g, note: function(m){
+          var n = toHalfWidthDigits(m[1]);
+          if(n === "1") return "ひとり";
+          if(n === "2") return "ふたり";
+          return "「" + m[0] + "」の読み";
+        }},
+      { re: /([0-9０-９])つ/g, note: function(m){ return "「" + m[0] + "」の読み"; }}
+    ];
+    checkNumberPatterns.forEach(function(p){
+      var m;
+      p.re.lastIndex = 0;
+      while((m = p.re.exec(text)) !== null){
+        var from = m[0];
+        var noteText = p.note(m);
+        addCandidate(candidates, from, noteText, "check", false);
+        highlightSpans.push({start:m.index, end:m.index+from.length, type:"check"});
+      }
+    });
+
+    // 4) 記号
+    var symbolPatterns = [
+      { re: /→/g, to: "、" },
+      { re: /[～〜]/g, to: "から" },
+      { re: /※/g, to: "" },
+      { re: /\//g, to: "または" },
+      { re: /＋|\+/g, to: "プラス" },
+      { re: /＝|=/g, to: "イコール" },
+      { re: /[:：]/g, to: "、" }
+    ];
+    symbolPatterns.forEach(function(p){
+      var m;
+      p.re.lastIndex = 0;
+      while((m = p.re.exec(text)) !== null){
+        addCandidate(candidates, m[0], p.to, "replace", true);
+        highlightSpans.push({start:m.index, end:m.index+m[0].length, type:"replace"});
+      }
+    });
+
+    // 5) 助詞「へ」: 固有名詞（カタカナ/ひらがな連続の名前らしき語）直後の「へ」を検出
+    //    簡易ルール: 「くん」「さん」「ちゃん」「様」の直後の「へ」、または文頭の名詞+「へ」
+    var reHe = /(君|くん|さん|ちゃん|様)へ/g;
+    var mHe;
+    reHe.lastIndex = 0;
+    while((mHe = reHe.exec(text)) !== null){
+      var fromHe = mHe[0];
+      addCandidate(candidates, fromHe, "「え」と読まれる可能性あり", "check", false);
+      highlightSpans.push({start:mHe.index, end:mHe.index+fromHe.length, type:"check"});
+    }
+
+    // 6) 漢字の読み分かれ小辞書
+    var ambiguousKanji = ["方","他","何","大人数","上手","行った","開いた","辛い","人気","最中","一時","今日","明日","一日"];
+    ambiguousKanji.forEach(function(word){
+      var re = new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g");
+      var m;
+      re.lastIndex = 0;
+      while((m = re.exec(text)) !== null){
+        addCandidate(candidates, word, "文脈により読みが変わる可能性あり", "check", false);
+        highlightSpans.push({start:m.index, end:m.index+word.length, type:"check"});
+      }
+    });
+
+    return { candidates: candidates, spans: highlightSpans };
+  }
+
+  // ---------- ハイライト表示 ----------
+  function escapeHtml(s){
+    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  function renderHighlight(text, spans){
+    if(!spans.length){
+      document.getElementById("highlightPreview").textContent = text || "誤読候補は見つかりませんでした。";
+      return;
+    }
+    // 重なりを避けるため開始位置でソートし、重複部分は先勝ちでスキップ
+    var sorted = spans.slice().sort(function(a,b){ return a.start - b.start || b.end - a.end; });
+    var merged = [];
+    var lastEnd = -1;
+    sorted.forEach(function(sp){
+      if(sp.start >= lastEnd){
+        merged.push(sp);
+        lastEnd = sp.end;
+      }
+    });
+    var html = "";
+    var cursor = 0;
+    merged.forEach(function(sp){
+      html += escapeHtml(text.slice(cursor, sp.start));
+      var cls = sp.type === "check" ? "check" : "";
+      html += "<mark class=\"" + cls + "\">" + escapeHtml(text.slice(sp.start, sp.end)) + "</mark>";
+      cursor = sp.end;
+    });
+    html += escapeHtml(text.slice(cursor));
+    document.getElementById("highlightPreview").innerHTML = html;
+  }
+
+  // ---------- 一覧テーブル ----------
+  var resultTableBody = document.querySelector("#resultTable tbody");
+  var noResultMsg = document.getElementById("noResultMsg");
+
+  function renderTable(candidates){
+    resultTableBody.innerHTML = "";
+    var list = Object.keys(candidates).map(function(k){ return candidates[k]; });
+    list.sort(function(a,b){ return b.count - a.count; });
+
+    if(!list.length){
+      noResultMsg.style.display = "block";
+      return;
+    }
+    noResultMsg.style.display = "none";
+
+    list.forEach(function(item, idx){
+      var tr = document.createElement("tr");
+
+      var tdFrom = document.createElement("td");
+      tdFrom.textContent = item.from;
+      tr.appendChild(tdFrom);
+
+      var tdTo = document.createElement("td");
+      if(item.type === "check" && !item.to){
+        var toInput = document.createElement("input");
+        toInput.placeholder = "提案を入力（任意）";
+        toInput.style.width = "100%";
+        toInput.dataset.idx = idx;
+        toInput.addEventListener("input", function(){
+          item.to = toInput.value;
+        });
+        tdTo.appendChild(toInput);
+      }else{
+        tdTo.textContent = item.to;
+      }
+      tr.appendChild(tdTo);
+
+      var tdType = document.createElement("td");
+      tdType.textContent = item.type === "check" ? "要確認" : (item.type === "delete" ? "削除（透かし）" : "置換候補");
+      tr.appendChild(tdType);
+
+      var tdCount = document.createElement("td");
+      tdCount.textContent = item.count;
+      tr.appendChild(tdCount);
+
+      var tdOn = document.createElement("td");
+      if(item.type === "delete"){
+        tdOn.textContent = "適用済み";
+      }else{
+        var cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.checked = item.defaultOn;
+        cb.addEventListener("change", function(){ item.enabled = cb.checked; renderOutputs(); });
+        item.enabled = item.defaultOn;
+        tdOn.appendChild(cb);
+      }
+      tr.appendChild(tdOn);
+
+      resultTableBody.appendChild(tr);
+    });
+  }
+
+  // ---------- 出力生成 ----------
+  var lastText = "";
+  var lastCandidates = {};
+
+  function applyReplacements(text, candidates){
+    var replacements = Object.keys(candidates)
+      .map(function(k){ return candidates[k]; })
+      .filter(function(c){ return c.type === "replace" && c.enabled; });
+
+    if(!replacements.length) return text;
+
+    replacements.sort(function(a,b){ return b.from.length - a.from.length; });
+
+    var result = text;
+    replacements.forEach(function(c){
+      var escaped = c.from.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      var re = new RegExp(escaped, "g");
+      result = result.replace(re, c.to);
+    });
+    return result;
+  }
+
+  function buildMemo(candidates){
+    var checks = Object.keys(candidates)
+      .map(function(k){ return candidates[k]; })
+      .filter(function(c){ return c.type === "check"; });
+    if(!checks.length) return "確認が必要な項目はありません。";
+    return checks.map(function(c){
+      var suffix = c.to ? "（" + c.to + "）" : "";
+      return "・「" + c.from + "」" + suffix + " ×" + c.count;
+    }).join("\n");
+  }
+
+  function renderOutputs(){
+    document.getElementById("outputText").value = applyReplacements(lastText, lastCandidates);
+    document.getElementById("memoText").value = buildMemo(lastCandidates);
+  }
+
+  // ---------- チェック実行 ----------
+  document.getElementById("checkBtn").addEventListener("click", function(){
+    var rawText = inputText.value;
+    var watermarkWords = getWatermarkWords();
+    var removed = removeWatermarkLines(rawText, watermarkWords);
+    var text = removed.text;
+    lastText = text;
+    var detected = detectAll(text, currentDict);
+    lastCandidates = detected.candidates;
+    if(removed.removedCount > 0){
+      lastCandidates["__watermark__delete"] = {
+        from: watermarkWords.join(", "),
+        to: "(行ごと削除)",
+        type: "delete",
+        count: removed.removedCount,
+        defaultOn: true,
+        enabled: true
+      };
+    }
+    renderHighlight(text, detected.spans);
+    renderTable(lastCandidates);
+    renderOutputs();
+  });
+
+  // ---------- コピー・保存 ----------
+  function copyToClipboard(text){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text);
+    }else{
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+  }
+
+  document.getElementById("copyOutputBtn").addEventListener("click", function(){
+    copyToClipboard(document.getElementById("outputText").value);
+  });
+  document.getElementById("copyMemoBtn").addEventListener("click", function(){
+    copyToClipboard(document.getElementById("memoText").value);
+  });
+  // 意図的簡略化: 複数ファイル読み込み時は連結して1つのテキストとして扱い、保存も1ファイルにまとめている。
+  // ファイルごとの個別保存やZIP出力は未対応。本格対応する場合はファイル境界を保持したまま処理し、保存時に分割する。
+  document.getElementById("saveOutputBtn").addEventListener("click", function(){
+    var text = document.getElementById("outputText").value;
+    var blob = new Blob([text], {type:"text/plain;charset=utf-8"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "yomiage.txt";
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+})();
+</script>
+</body>
+</html>

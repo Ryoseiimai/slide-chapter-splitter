@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>まず、これだけ。 | スライド章分割ツール</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent:#1a56db;
+    --bg:#ffffff;
+    --fg:#000000;
+    --line:#e2e2e2;
+    --card:#f7f7f8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:"Noto Sans JP", -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+    background:var(--bg);
+    color:var(--fg);
+    margin:0;
+    padding:0 0 60px;
+    font-size:20px;
+    line-height:1.8;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px;}
+  a{color:var(--accent);}
+  h1{
+    font-size:34px;
+    font-weight:900;
+    margin:40px 0 8px;
+    line-height:1.4;
+  }
+  .lead{
+    font-size:20px;
+    margin:0 0 32px;
+  }
+  h2{
+    font-size:24px;
+    font-weight:700;
+    margin:0 0 20px;
+    border-top:2px solid var(--line);
+    padding-top:32px;
+  }
+  section:first-of-type h2{border-top:none;padding-top:0;}
+
+  /* 数字カード */
+  .num-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+    margin-bottom:16px;
+  }
+  .num-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:20px;
+  }
+  .num-card .num{
+    font-size:36px;
+    font-weight:900;
+    color:var(--accent);
+    line-height:1.2;
+  }
+  .num-card .desc{
+    font-size:16px;
+    margin-top:6px;
+  }
+  .footnote{
+    font-size:16px;
+    color:var(--fg);
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:14px 16px;
+    margin-top:4px;
+  }
+
+  /* 手順 */
+  ol.steps{list-style:none;margin:0;padding:0;}
+  ol.steps li{
+    display:flex;
+    gap:16px;
+    margin-bottom:20px;
+    align-items:flex-start;
+  }
+  .step-num{
+    flex:0 0 auto;
+    width:36px;height:36px;
+    border-radius:50%;
+    background:var(--accent);
+    color:#fff;
+    font-weight:900;
+    font-size:18px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .step-body p{margin:0 0 6px;}
+  .step-body .sub{
+    font-size:16px;
+    color:var(--fg);
+  }
+  .step-body a{word-break:break-all;}
+  .btn-link{
+    display:inline-block;
+    margin-top:4px;
+    padding:10px 18px;
+    border-radius:6px;
+    background:var(--accent);
+    color:#fff;
+    font-weight:700;
+    text-decoration:none;
+    font-size:17px;
+  }
+
+  /* その他資料 */
+  ul.plain{margin:0;padding-left:0;list-style:none;}
+  ul.plain li{
+    padding:10px 0;
+    border-bottom:1px solid var(--line);
+    font-size:17px;
+  }
+  ul.plain li:last-child{border-bottom:none;}
+
+  footer{
+    margin-top:40px;
+    padding-top:24px;
+    border-top:2px solid var(--line);
+    font-size:15px;
+    color:var(--fg);
+  }
+
+  @media (max-width:520px){
+    body{font-size:18px;}
+    h1{font-size:26px;}
+    .lead{font-size:18px;}
+    .num-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <section>
+    <h1>まず、これだけ。</h1>
+    <p class="lead">2つの困りごとは、それぞれ3手順で解決します。実物のスライド339枚で確認済みです。</p>
+  </section>
+
+  <section>
+    <h2>実物で確認した結果</h2>
+    <div class="num-grid">
+      <div class="num-card">
+        <div class="num">339枚 → 15章</div>
+        <div class="desc">に分割（手入力の区切りで、ページの過不足ゼロ）</div>
+      </div>
+      <div class="num-card">
+        <div class="num">約2〜5秒</div>
+        <div class="desc">339枚の読み込みから章の下書きが出るまで</div>
+      </div>
+      <div class="num-card">
+        <div class="num">0ページ</div>
+        <div class="desc">文字が取れなかったページ。全ページ台本用テキストにできる</div>
+      </div>
+      <div class="num-card">
+        <div class="num">30ファイル</div>
+        <div class="desc">章ごとのPDF15本＋テキスト15本がZIP1つで出る</div>
+      </div>
+    </div>
+    <p class="footnote">自動検出は、章の見出しに使っている言葉の欄に「SYSTEM」を足すと15章のうち13章が一致しました。残り2つは、スライド側で章番号が誤って書かれたページ（あなたのCodexも要確認に挙げた122・126）です。区切りページ番号を直して「反映」すれば15章ぴったりになります。</p>
+  </section>
+
+  <section>
+    <h2>課題② 350枚を章ごとに分けたい</h2>
+    <ol class="steps">
+      <li>
+        <span class="step-num">1</span>
+        <div class="step-body">
+          <p>スライドをPDFにして、下のツールに入れる</p>
+          <p><a class="btn-link" href="https://ryoseiimai.github.io/slide-chapter-splitter/" target="_blank" rel="noopener">章分割ツールを開く</a></p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">2</span>
+        <div class="step-body">
+          <p>区切りページ番号の欄に、章の始まりページを貼って「反映」</p>
+          <p class="sub">例: 1, 10, 17, …　※自分のCodexが出した章割りをそのまま使えます</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">3</span>
+        <div class="step-body">
+          <p>「全章をまとめてZIPで保存」→ 章ごとのPDFとテキストが手に入る</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>課題① スライドから台本を作るコピペをなくしたい</h2>
+    <ol class="steps">
+      <li>
+        <span class="step-num">1</span>
+        <div class="step-body">
+          <p>章のカードで「台本用テキストをコピー」（頼み方の文が先頭に付いた状態で入ります）</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">2</span>
+        <div class="step-body">
+          <p>ChatGPTに貼って送る → 台本が返る</p>
+          <p class="sub">もう自分のCodexで93本作ってある人は、ここは飛ばしてOK</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">3</span>
+        <div class="step-body">
+          <p>台本を下のチェッカーに貼って「チェック」→「読み上げ用テキストをコピー」→ VREWに貼る</p>
+          <p><a class="btn-link" href="https://ryoseiimai.github.io/slide-chapter-splitter/yomiage/" target="_blank" rel="noopener">誤読チェッカーを開く</a></p>
+          <p class="sub">（「STEP1」が「エスティーイーピー」と読まれる等を先に潰す）</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>その先（全自動にしたい人）</h2>
+    <p><a href="../automation/">自動化の道すじを見る</a>　／　<a href="../automation/slide-script-automation-gamebook.md">Codex向け手順書を開く</a></p>
+  </section>
+
+  <section>
+    <h2>他の資料</h2>
+    <ul class="plain">
+      <li><a href="../howto/">使い方ガイド</a></li>
+      <li><a href="../handoff/">引き継ぎ書・レビューリスト</a></li>
+      <li><a href="../">報告書トップ</a></li>
+    </ul>
+  </section>
+
+  <footer>
+    <p>作成：今井涼晴　／　2026年9月2日</p>
+    <p>データはブラウザ内処理・送信なし。</p>
+  </footer>
+
+</div>
+</body>
+</html>

@@ -249,6 +249,12 @@
       <thead><tr><th>章番号</th><th>開始ページ</th><th>終了ページ</th><th>タイトル候補</th></tr></thead>
       <tbody></tbody>
     </table>
+    <p class="lead" style="font-size:14px;">自動検出は下書きです。章の数が多すぎる・少なすぎるときは、区切りページ番号を直して「反映」してください。</p>
+    <label for="extra-keywords-input">章の見出しに使っている言葉（カンマ区切り・追加分）</label>
+    <div class="row">
+      <input type="text" id="extra-keywords-input" placeholder="SYSTEM, SUPPORT, まとめ, おわりに">
+      <button id="redetect-btn" class="secondary">自動検出をやり直す</button>
+    </div>
     <label for="split-pages-input">区切りページ番号（カンマ区切り。例: 1, 15, 42, 88）</label>
     <div class="row">
       <input type="text" id="split-pages-input">
@@ -311,11 +317,21 @@ const step3 = document.getElementById('step3');
 const detectTableBody = document.querySelector('#detect-table tbody');
 const splitPagesInput = document.getElementById('split-pages-input');
 const applySplitBtn = document.getElementById('apply-split-btn');
+const extraKeywordsInput = document.getElementById('extra-keywords-input');
+const redetectBtn = document.getElementById('redetect-btn');
 const noDetectFallback = document.getElementById('no-detect-fallback');
 const everyNInput = document.getElementById('every-n-input');
 const applyEveryNBtn = document.getElementById('apply-every-n-btn');
 const cardsContainer = document.getElementById('cards-container');
 const zipAllBtn = document.getElementById('zip-all-btn');
+
+const EXTRA_KEYWORDS_STORAGE_KEY = 'slide-chapter-splitter:extra-keywords';
+try {
+  const savedKeywords = localStorage.getItem(EXTRA_KEYWORDS_STORAGE_KEY);
+  if (savedKeywords) extraKeywordsInput.value = savedKeywords;
+} catch (e) {
+  // localStorageが使えない環境では無視する
+}
 
 dropZone.addEventListener('click', () => fileInput.click());
 dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
@@ -365,48 +381,108 @@ async function handleFile(file) {
   detectChapters();
 }
 
-// 章の始まりを検出する正規表現
+// 意図的な簡略化: 定型パターン（STEP/第/Chapter等）と「章の見出しに使っている言葉（追加分）」欄で
+// 明示された語にしか対応しない。教材側が別の言い回しで見出しを付けたページや、番号が誤って
+// 前後するページは検出できない。本格対応する場合はレイアウト解析（文字サイズ・位置）を併用する必要がある。
+// 章の始まりを検出する正規表現（type = 章キーの種類。番号は各正規表現の第1グループ）
 const CHAPTER_PATTERNS = [
-  /第\s*[0-9０-９一二三四五六七八九十百]+\s*[章部節講回]/,
-  /(Chapter|CHAPTER|Section|Lesson|Part)\s*\d+/,
-  /^(STEP|Step|ステップ)\s*[0-9０-９]+/
+  { type: '第',      re: /第\s*([0-9０-９一二三四五六七八九十百]+)\s*[章部節講回]/ },
+  { type: 'Chapter', re: /(?:Chapter|CHAPTER)\s*(\d+)/ },
+  { type: 'Section', re: /Section\s*(\d+)/ },
+  { type: 'Lesson',  re: /Lesson\s*(\d+)/ },
+  { type: 'Part',    re: /Part\s*(\d+)/ },
+  { type: 'STEP',    re: /^(?:STEP|Step|ステップ)\s*([0-9０-９]+)/ }
 ];
 
-function normalizeTitle(t) {
-  return t.replace(/\s+/g, '').trim();
+// 語+数字の直後に空白（改行含む）を挟んで数字が続く形を結合する。
+// pdf.jsの抽出でテキストが細かく分割され「STEP 0」と「1」に割れる事例への対処。
+const SPLIT_NUMBER_JOIN_RE = /((?:STEP|Step|ステップ|Chapter|Lesson|Part|第)\s*\d)\s+(\d)/g;
+
+function toHalfWidthDigits(s) {
+  return s.replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0));
 }
 
+// 漢数字（一〜十、百の組み合わせ）または半角/全角数字を整数に変換する。
+// 意図的な簡略化: 千以上の漢数字には対応しない。本格対応する場合は位取りの再帰変換が必要。
+function kanjiToInt(s) {
+  if (/^[0-9]+$/.test(s)) return parseInt(s, 10);
+  if (/^[0-9０-９]+$/.test(s)) return parseInt(toHalfWidthDigits(s), 10);
+  const digits = { '零': 0, '〇': 0, '一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9 };
+  let total = 0;
+  let num = 0;
+  for (const ch of s) {
+    if (ch === '十') {
+      total += (num || 1) * 10;
+      num = 0;
+    } else if (ch === '百') {
+      total += (num || 1) * 100;
+      num = 0;
+    } else if (digits[ch] !== undefined) {
+      num = digits[ch];
+    }
+  }
+  total += num;
+  return total;
+}
+
+function preprocessHead(rawText) {
+  let head = rawText.slice(0, 200);
+  // 全角/半角スペースの連続を1つの半角スペースに正規化（改行は行判定のため保持する）
+  head = head.replace(/[　 ]+/g, ' ');
+  head = head.replace(SPLIT_NUMBER_JOIN_RE, '$1$2');
+  return head;
+}
+
+function keysEqual(a, b) {
+  return a.type === b.type && a.num === b.num;
+}
+
+// 見出し候補として見る先頭の文字数。本文中の言及（表・参照）を拾わないため、
+// スライドの見出しはページの先頭にある前提でここだけを判定対象にする。
+const HEAD_WINDOW = 60;
+
 function findChapterMatch(text) {
-  const head = text.slice(0, 200);
+  const head = preprocessHead(text).slice(0, HEAD_WINDOW);
   const lines = head.split('\n').map(l => l.trim()).filter(Boolean);
+  const extraKeywords = state.extraKeywords || [];
   for (const line of lines) {
     for (const pat of CHAPTER_PATTERNS) {
-      const m = line.match(pat);
-      if (m) return line;
+      const m = line.match(pat.re);
+      if (m) return { line, key: { type: pat.type, num: kanjiToInt(m[1]) } };
+    }
+    for (const kw of extraKeywords) {
+      if (line.toLowerCase().startsWith(kw.toLowerCase())) {
+        return { line, key: { type: 'KW:' + kw.toLowerCase(), num: null } };
+      }
     }
   }
   return null;
 }
 
 function detectChapters() {
+  state.extraKeywords = extraKeywordsInput.value.split(',').map(s => s.trim()).filter(Boolean);
+
   const candidates = []; // {page, title}
-  let lastNormalized = null;
+  let lastKey = null;
 
   for (let i = 0; i < state.totalPages; i++) {
     const pageNum = i + 1;
-    const match = findChapterMatch(state.pageTexts[i]);
+    const found = findChapterMatch(state.pageTexts[i]);
     if (pageNum === 1) {
       // 1ページ目は常に区切り
-      candidates.push({ page: 1, title: match || '（表紙 / はじめ）' });
-      lastNormalized = match ? normalizeTitle(match) : null;
+      candidates.push({ page: 1, title: found ? found.line : '（表紙 / はじめ）' });
+      lastKey = found ? found.key : null;
       continue;
     }
-    if (match) {
-      const norm = normalizeTitle(match);
-      if (norm === lastNormalized) continue; // 同一章タイトルの連続ページはスキップ
-      candidates.push({ page: pageNum, title: match });
-      lastNormalized = norm;
+    if (!found) continue;
+    const key = found.key;
+    if (lastKey && keysEqual(key, lastKey)) continue; // 同じ章キーの続き（Phase違い等）はスキップ
+    if (lastKey && key.type === lastKey.type && key.num != null && lastKey.num != null && key.num < lastKey.num) {
+      // 番号が直前より小さい候補は無視（本文中の過去の章番号への言及などの誤検出防止）
+      continue;
     }
+    candidates.push({ page: pageNum, title: found.line });
+    lastKey = key;
   }
 
   state.detectedSplitPages = candidates.map(c => c.page);
@@ -415,7 +491,6 @@ function detectChapters() {
   splitPagesInput.value = state.detectedSplitPages.join(', ');
 
   // 検出0件（1ページ目のみ、かつタイトル無し）の場合はフォールバック表示
-  const realDetections = candidates.filter((c, idx) => idx > 0 || c.title !== '（表紙 / はじめ）');
   if (state.totalPages > 1 && candidates.length <= 1) {
     noDetectFallback.classList.remove('hidden');
   } else {
@@ -438,7 +513,7 @@ function buildChaptersFromSplitPages(splitPages, titles) {
     let title = titles && titles[i] ? titles[i] : null;
     if (!title) {
       const auto = findChapterMatch(state.pageTexts[start - 1]);
-      title = auto || `第${i + 1}章`;
+      title = auto ? auto.line : `第${i + 1}章`;
     }
     chapters.push({ num: i + 1, start, end, title });
   }
@@ -464,6 +539,15 @@ applySplitBtn.addEventListener('click', () => {
     return;
   }
   buildChaptersFromSplitPages(pages, null);
+});
+
+redetectBtn.addEventListener('click', () => {
+  try {
+    localStorage.setItem(EXTRA_KEYWORDS_STORAGE_KEY, extraKeywordsInput.value);
+  } catch (e) {
+    // localStorageが使えない環境では無視する
+  }
+  detectChapters();
 });
 
 applyEveryNBtn.addEventListener('click', () => {
@@ -495,6 +579,20 @@ function padNum(n) {
 
 function chapterFilenameBase(ch) {
   return `${padNum(ch.num)}_${sanitizeFilename(ch.title)}`;
+}
+
+// ZIP内のファイル名はmacOS標準unzipでの文字化け・展開失敗を避けるため英数字に限定する。
+// 日本語タイトルとの対応は index.txt に書き出す。
+function zipEntryBase(ch) {
+  return `ch${padNum(ch.num)}_slides_${ch.start}-${ch.end}`;
+}
+
+function buildZipIndexText(chapters) {
+  let text = '章番号（ZIP内ファイル名）と日本語タイトルの対応表\n\n';
+  for (const ch of chapters) {
+    text += `${zipEntryBase(ch)} = 第${ch.num}章 ${ch.title}（${ch.start}〜${ch.end}ページ）\n`;
+  }
+  return text;
 }
 
 function buildScriptText(ch) {
@@ -589,13 +687,14 @@ zipAllBtn.addEventListener('click', async () => {
   try {
     const zip = new JSZip();
     for (const ch of state.chapters) {
-      const base = chapterFilenameBase(ch);
+      const base = zipEntryBase(ch);
       const pdfBytes = await buildChapterPdfBytes(ch);
       zip.file(`${base}.pdf`, pdfBytes);
       zip.file(`${base}.txt`, buildScriptText(ch));
     }
+    zip.file('index.txt', buildZipIndexText(state.chapters));
     const blob = await zip.generateAsync({ type: 'blob' });
-    saveAs(blob, '章ごとスライド一式.zip');
+    saveAs(blob, 'slides_by_chapter.zip');
   } finally {
     zipAllBtn.disabled = false;
     zipAllBtn.textContent = '全章をまとめてZIPで保存';

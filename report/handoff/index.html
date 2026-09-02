@@ -160,6 +160,11 @@
           <td>ツールのプログラム本体（GitHub）</td>
           <td><a href="https://github.com/Ryoseiimai/slide-chapter-splitter" target="_blank" rel="noopener">開く</a></td>
         </tr>
+        <tr>
+          <td>VREW誤読チェッカー</td>
+          <td>台本を貼ると誤読候補をハイライトし、読み上げ用の表記に置き換える</td>
+          <td><a href="https://ryoseiimai.github.io/slide-chapter-splitter/yomiage/" target="_blank" rel="noopener">開く</a></td>
+        </tr>
       </tbody>
     </table>
   </section>
@@ -173,6 +178,10 @@
     <div class="qa">
       <p class="q">② 350枚のスライドが章をまたいで一続きになっている</p>
       <p class="a">ツールがスライドの内容から章の区切りを自動検出し、章ごとのPDF・テキスト・ZIPに分割できるようにしました。区切りがずれた場合は手で直せます。</p>
+    </div>
+    <div class="qa">
+      <p class="q">③ 「BREW」とは何のことか</p>
+      <p class="a">VREW（動画編集・AI読み上げソフト）と判明しました。りょうすけさんはご自身のCodexで、Googleスライド全339枚から章別PDF15本・動画台本93本まで、すでに作成済みです。</p>
     </div>
   </section>
 
@@ -225,6 +234,17 @@
       <textarea class="memo" id="memo-d" placeholder="気づいたことがあれば自由に書いてください"></textarea>
     </div>
 
+    <div class="checklist-section" data-section="E">
+      <h3>E. 読み上げ（VREW）</h3>
+      <div class="item"><input type="checkbox" id="e1"><label for="e1">誤読チェッカーで台本1本を変換した</label></div>
+      <div class="item"><input type="checkbox" id="e2"><label for="e2">VREWで1本聴いて誤読を書き出した</label></div>
+      <div class="item"><input type="checkbox" id="e3"><label for="e3">その語を辞書に足して再変換した</label></div>
+      <div class="item"><input type="checkbox" id="e4"><label for="e4">「へ」「は」など助詞の読みを確認した</label></div>
+      <div class="item"><input type="checkbox" id="e5"><label for="e5">章配置が食い違う5枚（122・126・130・135・179）の置き場所を決めた</label></div>
+      <p class="memo-label">メモ（Eについて）</p>
+      <textarea class="memo" id="memo-e" placeholder="気づいたことがあれば自由に書いてください"></textarea>
+    </div>
+
     <div class="btn-row">
       <button type="button" class="btn btn-outline" id="clear-btn">すべてクリア</button>
     </div>
@@ -244,9 +264,9 @@
   <section id="next-steps">
     <h2>次の一手（提案）</h2>
     <ol class="next-steps">
-      <li><span class="tag">優先1</span>実際のスライド1本で、今日試してみる。</li>
-      <li><span class="tag">優先2</span>1章ぶんの台本をChatGPTで作ってみて、文体を固める。</li>
-      <li><span class="tag">優先3</span>Codex向け手順書を使って、自動化に着手する。</li>
+      <li><span class="tag">優先1</span>誤読チェッカーで台本1本を変換し、VREWで聴いてみる（今日）。</li>
+      <li><span class="tag">優先2</span>辞書を育てながら、全93本の台本を読み上げ用に変換する。</li>
+      <li><span class="tag">優先3</span>VREWの声・速度・字幕設定を1本目で固め、以降は同じ設定で量産する。</li>
     </ol>
   </section>
 
@@ -266,6 +286,7 @@
       <thead><tr><th>日付</th><th>内容</th></tr></thead>
       <tbody>
         <tr><td>2026-09-02</td><td>初版: ツール公開・報告書・使い方・自動化手順書・引き継ぎ書</td></tr>
+        <tr><td>2026-09-02</td><td>追記: BREW=VREW判明、誤読チェッカー追加、レビューEを追加</td></tr>
       </tbody>
     </table>
   </footer>
@@ -280,7 +301,8 @@
     A: { checkboxes: ["a1","a2","a3","a4","a5","a6"], memo: "memo-a" },
     B: { checkboxes: ["b1","b2","b3","b4"], texts: ["b1-text","b2-text","b3-text","b4-text"], memo: "memo-b" },
     C: { checkboxes: ["c1","c2","c3"], memo: "memo-c" },
-    D: { checkboxes: ["d1","d2","d3","d4"], memo: "memo-d" }
+    D: { checkboxes: ["d1","d2","d3","d4"], memo: "memo-d" },
+    E: { checkboxes: ["e1","e2","e3","e4","e5"], memo: "memo-e" }
   };
 
   function storageGet(key){
@@ -390,7 +412,8 @@
       A: "A. ツール本体",
       B: "B. 実スライドで気になる点",
       C: "C. 台本の質",
-      D: "D. 自動化の準備"
+      D: "D. 自動化の準備",
+      E: "E. 読み上げ（VREW）"
     };
 
     Object.keys(sections).forEach(function(key){
