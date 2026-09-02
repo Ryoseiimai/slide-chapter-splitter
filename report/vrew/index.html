@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VREWに台本を自動で入れる、3つの道</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent:#1a56db;
+    --bg:#ffffff;
+    --fg:#111111;
+    --sub:#555555;
+    --line:#e2e2e2;
+    --card:#f7f7f8;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:"Noto Sans JP", -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+    background:var(--bg);
+    color:var(--fg);
+    margin:0;
+    padding:0 0 100px;
+    font-size:18px;
+    line-height:1.85;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:0 20px;}
+  a{color:var(--accent);}
+
+  header.hero{padding:56px 0 40px;border-bottom:1px solid var(--line);}
+  header.hero h1{font-size:32px;font-weight:900;line-height:1.5;margin:0 0 18px;}
+  header.hero .lead{font-size:18px;color:var(--sub);margin:0;}
+
+  section{padding:44px 0;border-bottom:1px solid var(--line);}
+  section:last-of-type{border-bottom:none;}
+  h2{font-size:24px;font-weight:700;margin:0 0 20px;}
+  h3{font-size:18px;font-weight:700;margin:0 0 8px;}
+  p{margin:0 0 14px;}
+
+  .info-box{
+    background:var(--card);
+    border-left:3px solid var(--accent);
+    padding:16px 18px;
+    border-radius:0 6px 6px 0;
+    font-size:16px;
+  }
+  .info-box .note{font-size:14px;color:var(--sub);margin-top:8px;margin-bottom:0;}
+
+  .stage-card{
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:20px 22px;
+    margin-bottom:16px;
+  }
+  .stage-card .stage-num{
+    display:inline-block;
+    background:var(--accent);
+    color:#fff;
+    font-size:13px;
+    font-weight:700;
+    padding:3px 10px;
+    border-radius:999px;
+    margin-bottom:10px;
+  }
+  .stage-card .badge{
+    display:inline-block;
+    margin-left:8px;
+    font-size:13px;
+    font-weight:700;
+    padding:3px 10px;
+    border-radius:999px;
+  }
+  .badge-now{background:#eaf0fd;color:var(--accent);}
+  .badge-dev{background:#fff4de;color:#8a5b00;}
+  .badge-alt{background:#e9f8ee;color:#1a7f3c;}
+  .stage-row{margin:6px 0;font-size:16px;}
+  .stage-row .label{font-weight:700;display:inline-block;min-width:7.5em;}
+
+  table{width:100%;border-collapse:collapse;font-size:15px;margin-top:8px;}
+  .table-scroll{overflow-x:auto;}
+  th,td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top;}
+  th{background:var(--card);font-weight:700;}
+
+  ul.plain{margin:0;padding-left:1.3em;}
+  ul.plain li{margin-bottom:10px;font-size:16px;}
+
+  ul.promise{list-style:none;padding:0;margin:14px 0 0;}
+  ul.promise li{
+    padding:10px 0 10px 30px;
+    position:relative;
+    font-size:16px;
+    border-top:1px solid var(--line);
+  }
+  ul.promise li:first-child{border-top:none;}
+  ul.promise li::before{
+    content:"×";
+    position:absolute;
+    left:0;
+    top:10px;
+    color:#c33;
+    font-weight:700;
+  }
+
+  .source{font-size:13px;color:var(--sub);word-break:break-all;}
+  .source a{color:var(--sub);}
+
+  footer{padding:40px 0 0;font-size:14px;color:var(--sub);}
+  footer a{margin-right:16px;}
+
+  @media (max-width:600px){
+    header.hero{padding:40px 0 28px;}
+    header.hero h1{font-size:26px;}
+    section{padding:32px 0;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>VREWに台本を自動で入れる、3つの道</h1>
+    <p class="lead">結論：VREWには公式のAPIや一括生成の機能はありません。それを前提に、「今すぐ使える半自動」「検証中の自動操作」「VREWを使わない完全自動」の3つを用意しました。</p>
+  </div>
+</header>
+
+<section id="fact">
+  <div class="wrap">
+    <h2>まず分かったこと</h2>
+    <div class="info-box">
+      <p style="margin:0;">VREWの運営チームに直接確認したところ、「APIも一括生成も提供していない」との回答でした。ですので、外部のプログラムからVREWへ台本を自動で流し込む公式な方法はありません。</p>
+      <p class="note">出典: <a href="https://vrewjp.imweb.me/questions/?bmode=view&idx=146140270" target="_blank" rel="noopener">VREW公式Q&A（ログイン必須）</a></p>
+    </div>
+    <p style="margin-top:16px;">一方で、2025年7月からブラウザで使える「Web版VREW」が始まっています。実際にログインして開き、「新規で作成」の中に次の3つがあることを確認しました。</p>
+    <ul class="plain">
+      <li>テキストから動画を作成</li>
+      <li>スライドで動画を作成（PDF・PPT・PPTXを読み込める）</li>
+      <li>AI音声で始める</li>
+    </ul>
+    <p class="source">出典: <a href="https://vrewjp.imweb.me/?bmode=view&idx=166487519" target="_blank" rel="noopener">VREW公式・Web版のお知らせ</a></p>
+  </div>
+</section>
+
+<section id="stages">
+  <div class="wrap">
+    <h2>3つの道</h2>
+
+    <div class="stage-card">
+      <span class="stage-num">①</span><span class="badge badge-now">今すぐ使える</span>
+      <h3>半自動：Web版VREWの「スライドで動画を作成」</h3>
+      <div class="stage-row"><span class="label">やること：</span>Web版VREWを開く → 「スライドで動画を作成」を選ぶ → 章のPDFを入れる → 台本を貼る → 声を選ぶ、の3手順を章ごとに繰り返す</div>
+      <div class="stage-row"><span class="label">人がやること：</span>この3手順そのもの（現時点ではボタンを押すのは人）</div>
+      <div class="stage-row"><span class="label">向いている場面：</span>今日から使いたい、章の本数がそれほど多くない</div>
+    </div>
+
+    <div class="stage-card">
+      <span class="stage-num">②</span><span class="badge badge-dev">検証中</span>
+      <h3>自動操作：①をブラウザ自動操作で回す</h3>
+      <div class="stage-row"><span class="label">やること：</span>①と同じ画面を、ブラウザを自動で動かすAI（Claude in Chrome等）に操作させる</div>
+      <div class="stage-row"><span class="label">人がやること：</span>最初のログインだけ。以降は「章の一覧を渡すと順番に投入する」形にできる見込み</div>
+      <div class="stage-row"><span class="label">今の状態：</span>今井のVREWアカウントで動作確認を進めている段階。まだ本番投入には使っていない</div>
+    </div>
+
+    <div class="stage-card">
+      <span class="stage-num">③</span><span class="badge badge-alt">代替・完全自動</span>
+      <h3>VREWを使わない完全自動：autovideo</h3>
+      <div class="stage-row"><span class="label">やること：</span>章のPDFとページごとの台本を渡すと、無料の読み上げ（edge-tts）と字幕を焼き込んだmp4を自動で作る</div>
+      <div class="stage-row"><span class="label">確認済み：</span>実物の章で書き出しを1本試作済み。透かしなし、文字数の上限なし</div>
+      <div class="stage-row"><span class="label">できあがった動画をVREWに読み込んで、字幕の手直しだけVREWでやることも可能</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="compare">
+  <div class="wrap">
+    <h2>3つの道の比較</h2>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th></th><th>①半自動</th><th>②自動操作</th><th>③autovideo</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>人が手を動かす回数</td>
+            <td>3手順×章の数</td>
+            <td>最初のログインのみ（検証中）</td>
+            <td>ほぼゼロ（PDFと台本を渡すだけ）</td>
+          </tr>
+          <tr>
+            <td>今すぐ使えるか</td>
+            <td>使える</td>
+            <td>検証中（未確定）</td>
+            <td>使える（試作済み）</td>
+          </tr>
+          <tr>
+            <td>動画の透かし</td>
+            <td>無料枠は冒頭10秒に「Vrew」の透かしが入る</td>
+            <td>①と同じ（VREW側の仕様のため）</td>
+            <td>なし</td>
+          </tr>
+          <tr>
+            <td>1回あたりの文字数上限</td>
+            <td>「テキストから動画」機能は無料3,000字・有料10,000字（1文＝1クリップ）</td>
+            <td>①と同じ</td>
+            <td>上限なし</td>
+          </tr>
+          <tr>
+            <td>声の質</td>
+            <td>VREWのAI音声（複数の声から選べる）</td>
+            <td>①と同じ</td>
+            <td>Microsoftの日本語音声（Nanami等）</td>
+          </tr>
+          <tr>
+            <td>字幕・演出</td>
+            <td>VREWの字幕編集がそのまま使える</td>
+            <td>①と同じ</td>
+            <td>字幕は焼き込み。BGM・画像演出はなし</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="source" style="margin-top:12px;">出典: <a href="https://vrewjp.imweb.me/FAQ/?bmode=view&idx=15428813" target="_blank" rel="noopener">文字数上限（公式FAQ）</a> ／ <a href="https://vrewjp.imweb.me/notice/?bmode=view&idx=170656260" target="_blank" rel="noopener">クレジット制・透かしの案内（公式）</a> ／ <a href="https://docs.channel.io/vrew-payment/ja/articles/58d4ac45" target="_blank" rel="noopener">料金の説明（公式）</a></p>
+  </div>
+</section>
+
+<section id="not-doing">
+  <div class="wrap">
+    <h2>やらないこと</h2>
+    <ul class="promise">
+      <li>.vrewファイル（プロジェクトファイル）を外部から自動生成すること。仕様が公開されておらず、VREW側の更新で壊れやすいため採用しません</li>
+      <li>無料枠の透かしを消す・回避すること。VREW公式の仕様で、有料プランで解除する以外の回避策は提供しません</li>
+    </ul>
+  </div>
+</section>
+
+<section id="misread">
+  <div class="wrap">
+    <h2>誤読対策</h2>
+    <p>台本をそのまま読ませると、「STEP1」などが変な読み方になることがあります。次の2つで対策します。</p>
+    <ul class="plain">
+      <li>誤読チェッカーで台本をチェックし、「VREWの発音辞書に登録する語」の一覧をコピーまたはCSVで書き出す（<a href="https://ryoseiimai.github.io/slide-chapter-splitter/yomiage/" target="_blank" rel="noopener">誤読チェッカーを開く</a>）</li>
+      <li>その一覧を、VREWの「AI音声」タブにある「発音辞書」に登録する。固有名詞をひらがな・カタカナに変換でき、部分一致で台本全体に効く。クリップごとに直したい場合は、各クリップの「発音」欄でも変更できる</li>
+    </ul>
+    <p style="margin-top:12px;">声の種類を変えたときは、誤読の出方も変わるので、1本目を必ず聴き直してください。</p>
+    <p class="source">出典: <a href="https://vrewjp.imweb.me/FAQ/?bmode=view&idx=16066418" target="_blank" rel="noopener">発音辞書（公式FAQ）</a></p>
+  </div>
+</section>
+
+<section id="cost">
+  <div class="wrap">
+    <h2>費用の目安</h2>
+    <p>VREWは2026年4月22日からクレジット制です。無料は月200クレジットで、AI音声は100文字＝1クレジット。無料プランは動画冒頭10秒に「Vrew」の透かしが入り、有料プランで解除されます。金額やクレジット数はVREW側の改定で変わるので、実際の申し込み前に公式サイトの最新情報を確認してください。</p>
+    <p class="source">出典: <a href="https://vrewjp.imweb.me/notice/?bmode=view&idx=170656260" target="_blank" rel="noopener">クレジット制のお知らせ（公式）</a> ／ <a href="https://docs.channel.io/vrew-payment/ja/articles/58d4ac45" target="_blank" rel="noopener">料金プラン（公式）</a></p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>作成 今井涼晴 2026-09-02</p>
+    <a href="../">報告書トップへ</a>
+    <a href="https://ryoseiimai.github.io/slide-chapter-splitter/yomiage/" target="_blank" rel="noopener">誤読チェッカー</a>
+  </div>
+</footer>
+
+</body>
+</html>

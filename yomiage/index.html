@@ -216,6 +216,17 @@
 </div>
 
 <section class="card">
+  <h2>VREWの発音辞書に登録する語</h2>
+  <p class="note">使い分け：A. 台本の表記を読み上げ用に書き換える（上の「読み上げ用テキスト」）／B. 表記はそのままにして VREW の発音辞書に登録する（この一覧）。字幕の見た目を変えたくないならB。</p>
+  <p class="note">「要確認」（へ／日付／読み分かれ）の項目は文脈依存のため、この一覧には含めません。実際に聴いて個別に判断してください。</p>
+  <textarea id="dictExportText" readonly></textarea>
+  <div class="row">
+    <button id="copyDictExportBtn">VREWの発音辞書に登録する語（コピー）</button>
+    <button id="saveDictExportCsvBtn">.csvで保存</button>
+  </div>
+</section>
+
+<section class="card">
   <h2>辞書を編集 <span class="badge">保存はこの端末のみ</span></h2>
   <table class="dict-table" id="dictTable">
     <thead><tr><th style="width:35%">英字表記</th><th style="width:50%">読み上げ表記</th><th style="width:15%">操作</th></tr></thead>
@@ -439,14 +450,19 @@
     var candidates = {}; // key -> candidate info
     var highlightSpans = []; // {start, end, type}
     var coveredRanges = []; // 既に別ルールで検出済みの範囲（英字語の重複検出を避けるため）
+    // VREW発音辞書エクスポート用（置換候補のうち「英字略語」「英字＋数字型の語幹」だけを集める）
+    var dictExportStems = {};  // 例: "STEP" -> "ステップ"
+    var dictExportAbbrevs = {}; // 例: "AI" -> "エーアイ"
 
     // 1) 英字＋数字の型
+    // stem: 単純に「英字語幹＋数字」の形で読みも「カタカナ語幹＋数字」になるもの（VREW辞書の部分一致登録に使える）
+    //       Chapter(第X章)やQ&A/Qは前後の形が変わるため辞書登録の語幹化はしない
     var patterns = [
-      { re: /(?:STEP|Step|step)\s*０?([0-9０-９]{1,2})/g, label: function(m){ return "ステップ" + digitsToKanjiNumber(m[1]); }},
+      { re: /(?:STEP|Step|step)\s*０?([0-9０-９]{1,2})/g, label: function(m){ return "ステップ" + digitsToKanjiNumber(m[1]); }, stem: {en:"STEP", kana:"ステップ"}},
       { re: /(?:Chapter|CHAPTER|chapter)\s*([0-9０-９]{1,2})/g, label: function(m){ return "第" + digitsToKanjiNumber(m[1]) + "章"; }},
-      { re: /(?:Lesson|LESSON|lesson)\s*([0-9０-９]{1,2})/g, label: function(m){ return "レッスン" + digitsToKanjiNumber(m[1]); }},
-      { re: /(?:Part|PART|part)\s*([0-9０-９]{1,2})/g, label: function(m){ return "パート" + digitsToKanjiNumber(m[1]); }},
-      { re: /(?:Day|DAY|day)\s*([0-9０-９]{1,2})/g, label: function(m){ return "デイ" + digitsToKanjiNumber(m[1]); }},
+      { re: /(?:Lesson|LESSON|lesson)\s*([0-9０-９]{1,2})/g, label: function(m){ return "レッスン" + digitsToKanjiNumber(m[1]); }, stem: {en:"Lesson", kana:"レッスン"}},
+      { re: /(?:Part|PART|part)\s*([0-9０-９]{1,2})/g, label: function(m){ return "パート" + digitsToKanjiNumber(m[1]); }, stem: {en:"Part", kana:"パート"}},
+      { re: /(?:Day|DAY|day)\s*([0-9０-９]{1,2})/g, label: function(m){ return "デイ" + digitsToKanjiNumber(m[1]); }, stem: {en:"Day", kana:"デイ"}},
       { re: /Q&A/g, label: function(){ return "キューアンドエー"; }},
       { re: /Q([0-9０-９])/g, label: function(m){ return "キュー" + digitsToKanjiNumber(m[1]); }}
     ];
@@ -460,6 +476,7 @@
         var range = {start:m.index, end:m.index+from.length};
         highlightSpans.push({start:range.start, end:range.end, type:"replace"});
         coveredRanges.push(range);
+        if(p.stem){ dictExportStems[p.stem.en] = p.stem.kana; }
       }
     });
 
@@ -480,6 +497,7 @@
         var range2 = {start:m2.index, end:m2.index+word.length};
         highlightSpans.push({start:range2.start, end:range2.end, type:"replace"});
         coveredRanges.push(range2);
+        dictExportAbbrevs[word] = toVal;
       }
     }
 
@@ -569,7 +587,7 @@
       }
     });
 
-    return { candidates: candidates, spans: highlightSpans };
+    return { candidates: candidates, spans: highlightSpans, dictExportStems: dictExportStems, dictExportAbbrevs: dictExportAbbrevs };
   }
 
   // ---------- ハイライト表示 ----------
@@ -704,6 +722,50 @@
     document.getElementById("memoText").value = buildMemo(lastCandidates);
   }
 
+  // ---------- VREW発音辞書エクスポート ----------
+  var DICT_EXPORT_HEADER = "# VREW > AI音声 > 発音辞書 に1行ずつ登録してください（部分一致で全体に効きます）";
+  var lastDictExportRows = []; // [[word, reading], ...]
+
+  function buildDictExportRows(stems, abbrevs){
+    var rows = [];
+    var seen = {};
+    Object.keys(abbrevs).forEach(function(w){
+      if(seen[w]) return;
+      seen[w] = true;
+      rows.push([w, abbrevs[w]]);
+    });
+    Object.keys(stems).forEach(function(w){
+      if(seen[w]) return;
+      seen[w] = true;
+      rows.push([w, stems[w]]);
+    });
+    return rows;
+  }
+
+  function buildDictExportText(rows){
+    var lines = [DICT_EXPORT_HEADER];
+    rows.forEach(function(r){ lines.push(r[0] + "\t" + r[1]); });
+    return lines.join("\n");
+  }
+
+  function buildDictExportCsv(rows){
+    var lines = ["語,読み"];
+    rows.forEach(function(r){
+      lines.push(csvEscape(r[0]) + "," + csvEscape(r[1]));
+    });
+    return "﻿" + lines.join("\r\n");
+  }
+
+  function csvEscape(v){
+    var s = String(v);
+    if(/[",\n]/.test(s)){ s = "\"" + s.replace(/"/g,"\"\"") + "\""; }
+    return s;
+  }
+
+  function renderDictExport(rows){
+    document.getElementById("dictExportText").value = rows.length ? buildDictExportText(rows) : (DICT_EXPORT_HEADER + "\n（登録対象の語は見つかりませんでした）");
+  }
+
   // ---------- チェック実行 ----------
   document.getElementById("checkBtn").addEventListener("click", function(){
     var rawText = inputText.value;
@@ -726,6 +788,8 @@
     renderHighlight(text, detected.spans);
     renderTable(lastCandidates);
     renderOutputs();
+    lastDictExportRows = buildDictExportRows(detected.dictExportStems, detected.dictExportAbbrevs);
+    renderDictExport(lastDictExportRows);
   });
 
   // ---------- コピー・保存 ----------
@@ -747,6 +811,19 @@
   });
   document.getElementById("copyMemoBtn").addEventListener("click", function(){
     copyToClipboard(document.getElementById("memoText").value);
+  });
+  document.getElementById("copyDictExportBtn").addEventListener("click", function(){
+    copyToClipboard(document.getElementById("dictExportText").value);
+  });
+  document.getElementById("saveDictExportCsvBtn").addEventListener("click", function(){
+    var csv = buildDictExportCsv(lastDictExportRows);
+    var blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "vrew_hatsuon_jisho.csv";
+    a.click();
+    URL.revokeObjectURL(url);
   });
   // 意図的簡略化: 複数ファイル読み込み時は連結して1つのテキストとして扱い、保存も1ファイルにまとめている。
   // ファイルごとの個別保存やZIP出力は未対応。本格対応する場合はファイル境界を保持したまま処理し、保存時に分割する。

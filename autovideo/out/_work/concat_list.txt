@@ -1,0 +1,6 @@
+file '/Users/ryoseiworld/dev/2026-09-02-slide-chapter-splitter/autovideo/out/_work/clips/clip_001.mp4'
+file '/Users/ryoseiworld/dev/2026-09-02-slide-chapter-splitter/autovideo/out/_work/clips/clip_002.mp4'
+file '/Users/ryoseiworld/dev/2026-09-02-slide-chapter-splitter/autovideo/out/_work/clips/clip_003.mp4'
+file '/Users/ryoseiworld/dev/2026-09-02-slide-chapter-splitter/autovideo/out/_work/clips/clip_004.mp4'
+file '/Users/ryoseiworld/dev/2026-09-02-slide-chapter-splitter/autovideo/out/_work/clips/clip_005.mp4'
+file '/Users/ryoseiworld/dev/2026-09-02-slide-chapter-splitter/autovideo/out/_work/clips/clip_006.mp4'
