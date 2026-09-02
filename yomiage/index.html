@@ -564,6 +564,18 @@
       }
     });
 
+    // 4b) 英字の間のピリオド（例: Re.Origin）→ VREWがここでクリップを分割・読みも切れるため「・」に置換
+    //     小数（3.5）やNo.1のような「英字/記号＋数字」は対象外。英字↔英字のみを拾う。
+    var reDotBetweenLetters = /([A-Za-z])\.([A-Za-z])/g;
+    var mDot;
+    reDotBetweenLetters.lastIndex = 0;
+    while((mDot = reDotBetweenLetters.exec(text)) !== null){
+      var fromDot = mDot[0];
+      var toDot = mDot[1] + "・" + mDot[2];
+      addCandidate(candidates, fromDot, toDot, "replace", true);
+      highlightSpans.push({start:mDot.index, end:mDot.index+fromDot.length, type:"replace"});
+    }
+
     // 5) 助詞「へ」: 固有名詞（カタカナ/ひらがな連続の名前らしき語）直後の「へ」を検出
     //    簡易ルール: 「くん」「さん」「ちゃん」「様」の直後の「へ」、または文頭の名詞+「へ」
     var reHe = /(君|くん|さん|ちゃん|様)へ/g;

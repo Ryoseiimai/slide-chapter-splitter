@@ -212,6 +212,16 @@
           <li>完了ボタンが画面の見える範囲の外に出ることがあるため、事前に zoom を下げて全体を表示させておく</li>
         </ul>
       </details>
+
+      <div class="stage-row" style="margin-top:16px;"><span class="label">実物の章でも再現済み：</span>2026-09-03深夜、今井のVREWアカウントで実物のINTRO章（9枚・台本2,294字）を自動投入。AI音声（波音リツ）を生成し、6分58秒のプロジェクトが完成。人が押したのはログインだけ</div>
+
+      <p style="margin-top:16px;font-weight:700;font-size:14px;color:var(--sub);">つまずきどころ（実物の章で見つかったもの）</p>
+      <ul class="plain" style="font-size:14px;color:var(--sub);">
+        <li>章のPDFが大きい（目安3MB超）とVREWが「C174 PDF読み込みエラー」を返すことがある。110dpiで画像化して850KB程度に軽くしたPDFなら通った。→ 章PDFは軽量化してから入れる（軽量化の自動化は今回は未実装）</li>
+        <li>台本の中に英字＋ピリオド＋英字（例：会社名の「Re.Origin」のような表記）があると、VREWがそこでクリップを分割してしまい、読み上げも途中で切れる。→ 台本側で「.」をカタカナ読みか「・」に置き換えておくと安定する</li>
+        <li>いったん投入した後の「ファイル変更」メニューからの差し替えは失敗しやすい。失敗したら新規フローからやり直すほうが早い</li>
+      </ul>
+      <p class="source" style="margin-top:8px;">証拠画像は教材の中身（章名・本文）が写るため掲載しません（教材が写るため画像は非公開）。</p>
     </div>
 
     <div class="stage-card">
