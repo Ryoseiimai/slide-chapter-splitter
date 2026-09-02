@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>納品報告書 | スライド章分割ツール</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent:#1a56db;
+    --bg:#ffffff;
+    --fg:#111111;
+    --sub:#555555;
+    --line:#e2e2e2;
+    --card:#f7f7f8;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:"Noto Sans JP", -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+    background:var(--bg);
+    color:var(--fg);
+    margin:0;
+    padding:0 0 100px;
+    font-size:18px;
+    line-height:1.8;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:0 24px;}
+  a{color:var(--accent);}
+  img{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px;}
+  video{max-width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px;background:#000;}
+
+  /* Hero */
+  .hero{padding:72px 0 56px;}
+  .hero h1{
+    font-size:38px;
+    font-weight:900;
+    line-height:1.45;
+    margin:0 0 20px;
+  }
+  .hero .lead{
+    font-size:19px;
+    color:var(--sub);
+    margin:0 0 32px;
+  }
+  .hero-buttons{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:40px;}
+  .btn{
+    display:inline-block;
+    padding:16px 28px;
+    border-radius:8px;
+    font-size:17px;
+    font-weight:700;
+    text-decoration:none;
+    text-align:center;
+  }
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-secondary{background:#fff;color:var(--accent);border:2px solid var(--accent);}
+  .hero-shot{margin-top:32px;}
+  .hero-shot .caption{font-size:14px;color:var(--sub);margin-top:8px;}
+
+  section{padding:56px 0;border-top:1px solid var(--line);}
+  h2{font-size:26px;font-weight:700;margin:0 0 28px;}
+  h3{font-size:20px;font-weight:700;margin:0 0 12px;}
+
+  /* Before/After */
+  .compare{display:flex;gap:24px;flex-wrap:wrap;}
+  .compare > div{flex:1 1 320px;padding:24px;border-radius:8px;}
+  .compare .before{background:var(--card);}
+  .compare .after{background:#eef3fd;border:1px solid #c9d9f7;}
+  .compare ul{margin:0;padding-left:20px;}
+  .compare li{margin-bottom:12px;}
+  .note-inline{
+    display:inline-block;margin-top:16px;padding:10px 16px;
+    background:#fff;border:1px dashed var(--accent);border-radius:6px;
+    font-size:15px;color:var(--fg);
+  }
+
+  /* Steps */
+  .step{margin-bottom:48px;}
+  .step-num{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:32px;height:32px;border-radius:50%;
+    background:var(--accent);color:#fff;font-weight:700;font-size:16px;
+    margin-right:10px;
+  }
+  .step h3{display:flex;align-items:center;margin-bottom:16px;}
+  .shot-link{display:block;text-decoration:none;}
+
+  /* Try it table */
+  table{width:100%;border-collapse:collapse;font-size:16px;}
+  .table-scroll{overflow-x:auto;}
+  th,td{border:1px solid var(--line);padding:12px 14px;text-align:left;vertical-align:top;}
+  th{background:var(--card);font-weight:700;}
+  td a{word-break:break-all;}
+
+  details{
+    margin-top:24px;border:1px solid var(--line);border-radius:8px;
+    padding:16px 20px;background:var(--card);
+  }
+  summary{cursor:pointer;font-weight:700;font-size:17px;}
+  pre{
+    white-space:pre-wrap;word-break:break-word;
+    background:#fff;border:1px solid var(--line);border-radius:6px;
+    padding:16px;margin-top:16px;font-size:15px;line-height:1.7;
+    max-height:480px;overflow-y:auto;
+  }
+  .placeholder{
+    background:#fff;border:1px dashed var(--line);border-radius:6px;
+    padding:16px;color:var(--sub);font-size:15px;
+  }
+
+  /* Assurance / notes */
+  .list-clean{margin:0;padding-left:0;list-style:none;}
+  .list-clean li{
+    padding:14px 0 14px 32px;border-bottom:1px solid var(--line);
+    position:relative;
+  }
+  .list-clean li:before{
+    content:"○";position:absolute;left:0;top:14px;color:var(--accent);font-weight:700;
+  }
+  .list-clean li:last-child{border-bottom:none;}
+
+  ol.knowledge{padding-left:22px;margin:0;}
+  ol.knowledge li{margin-bottom:16px;}
+
+  footer{
+    padding:48px 0 0;color:var(--sub);font-size:15px;
+  }
+  footer .fbox{
+    background:var(--card);border-radius:8px;padding:24px;
+  }
+
+  @media (max-width:600px){
+    .hero{padding:48px 0 40px;}
+    .hero h1{font-size:28px;}
+    section{padding:40px 0;}
+    .btn{width:100%;}
+    .hero-buttons{flex-direction:column;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- 1. Hero -->
+  <section class="hero" style="border-top:none;padding-top:56px;">
+    <h1>350枚のスライドを、章ごとに、<br>1クリックで。</h1>
+    <p class="lead">
+      PDF化したスライドをアップロードするだけで、章の区切りを自動検出し、章ごとのPDF保存・台本用テキストのコピー・ZIP一括保存ができます。データはブラウザの中だけで処理され、外部には一切送信されません。
+    </p>
+    <div class="hero-buttons">
+      <a class="btn btn-primary" href="https://ryoseiimai.github.io/slide-chapter-splitter/" target="_blank" rel="noopener">ツールを開く</a>
+      <a class="btn btn-secondary" href="#demo">実演を見る（約15秒）</a>
+    </div>
+    <div class="hero-shot">
+      <a href="assets/tool_hero.png" target="_blank" rel="noopener"><img src="assets/tool_hero.png" alt="ツールの初期画面"></a>
+      <p class="caption">ツールの初期画面。PDFをドラッグ&ドロップするだけで解析が始まります。</p>
+    </div>
+  </section>
+
+  <!-- 2. Before/After -->
+  <section id="before-after">
+    <h2>ご相談内容 → 解決</h2>
+    <div class="compare">
+      <div class="before">
+        <h3>これまでの困りごと</h3>
+        <ul>
+          <li>① スライドをChatGPTに読ませて台本を作りたいが、1ページずつ内容をコピーするのが手間だった。</li>
+          <li>② 350枚のスライドが第1章から最終章まで一続きになっていて、Brewに読み込むと章がぶつ切りになってしまう。1章ずつ取り出したい。</li>
+        </ul>
+      </div>
+      <div class="after">
+        <h3>今回の解決策</h3>
+        <ul>
+          <li><strong>②が主目的：</strong>PDFをアップロードすると章の区切りを自動検出し、章ごとに1本のPDFとして保存できます。</li>
+          <li><strong>①も同時に解決：</strong>各章のスライド本文を「台本用テキストをコピー」ボタン1つでクリップボードにコピーでき、そのままChatGPTに貼り付けられます。</li>
+        </ul>
+        <p class="note-inline">つまり①は、②の機能に組み込まれた「台本用テキストをコピー」ボタンで対応しています。別々の作業ではなく、1つの流れの中で両方解決します。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Demo video -->
+  <section id="demo">
+    <h2>実演動画（約15秒）</h2>
+    <video controls playsinline poster="assets/demo_poster.png">
+      <source src="assets/demo.mp4" type="video/mp4">
+      お使いのブラウザは動画再生に対応していません。<a href="assets/demo.mp4">動画ファイルを直接開く</a>
+    </video>
+    <p class="caption">実際の操作をそのまま録画しています。編集・演出は加えていません。</p>
+  </section>
+
+  <!-- 4. How to use -->
+  <section id="how-to">
+    <h2>使い方 3ステップ</h2>
+
+    <div class="step">
+      <h3><span class="step-num">1</span>PDFをアップロードし、章の自動検出を確認する</h3>
+      <p>スライドをPDF化してアップロードすると、目次や見出しのパターンから章の区切りを自動的に検出します。</p>
+      <a class="shot-link" href="assets/check_01_detect.png" target="_blank" rel="noopener">
+        <img src="assets/check_01_detect.png" alt="章の自動検出結果の画面">
+      </a>
+    </div>
+
+    <div class="step">
+      <h3><span class="step-num">2</span>区切りが違う場合は手動で修正する</h3>
+      <p>目次ページが章として誤検出された場合などは、区切り欄の数字を編集するだけで簡単に修正できます。</p>
+      <a class="shot-link" href="assets/check_02_manual.png" target="_blank" rel="noopener">
+        <img src="assets/check_02_manual.png" alt="手動で章区切りを修正する画面">
+      </a>
+    </div>
+
+    <div class="step">
+      <h3><span class="step-num">3</span>章ごとのPDF・台本用テキスト・ZIPを保存する</h3>
+      <p>確定した章ごとにカードが並び、それぞれ「PDFを保存」「台本用テキストをコピー」ができます。まとめて欲しい場合はZIP一括保存も可能です。</p>
+      <a class="shot-link" href="assets/check_03_full.png" target="_blank" rel="noopener">
+        <img src="assets/check_03_full.png" alt="全体表示。章ごとのカードが3枚並んでいる画面">
+      </a>
+    </div>
+  </section>
+
+  <!-- 5. Try it -->
+  <section id="try-it">
+    <h2>実物を触ってみる</h2>
+    <p>今回の検証で実際に使用した入力PDF（18ページ）と、そこから生成された出力ファイルです。すべて実物ですので、そのままダウンロードして開けます。</p>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>種類</th>
+            <th>ファイル</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>入力（18ページ）</td>
+            <td><a href="assets/input_sample_ja.pdf" target="_blank" rel="noopener">input_sample_ja.pdf</a></td>
+          </tr>
+          <tr>
+            <td>出力：第1章 はじめに</td>
+            <td>
+              <a href="assets/01_%E7%AC%AC1%E7%AB%A0%20%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB.pdf" target="_blank" rel="noopener">01_第1章 はじめに.pdf</a>
+              ／
+              <a href="assets/01_%E7%AC%AC1%E7%AB%A0%20%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB.txt" target="_blank" rel="noopener">01_第1章 はじめに.txt</a>
+            </td>
+          </tr>
+          <tr>
+            <td>出力：第2章 集客の基本</td>
+            <td>
+              <a href="assets/02_%E7%AC%AC2%E7%AB%A0%20%E9%9B%86%E5%AE%A2%E3%81%AE%E5%9F%BA%E6%9C%AC.pdf" target="_blank" rel="noopener">02_第2章 集客の基本.pdf</a>
+              ／
+              <a href="assets/02_%E7%AC%AC2%E7%AB%A0%20%E9%9B%86%E5%AE%A2%E3%81%AE%E5%9F%BA%E6%9C%AC.txt" target="_blank" rel="noopener">02_第2章 集客の基本.txt</a>
+            </td>
+          </tr>
+          <tr>
+            <td>出力：第3章 商品設計</td>
+            <td>
+              <a href="assets/03_%E7%AC%AC3%E7%AB%A0%20%E5%95%86%E5%93%81%E8%A8%AD%E8%A8%88.pdf" target="_blank" rel="noopener">03_第3章 商品設計.pdf</a>
+              ／
+              <a href="assets/03_%E7%AC%AC3%E7%AB%A0%20%E5%95%86%E5%93%81%E8%A8%AD%E8%A8%88.txt" target="_blank" rel="noopener">03_第3章 商品設計.txt</a>
+            </td>
+          </tr>
+          <tr>
+            <td>まとめてダウンロード</td>
+            <td><a href="assets/%E7%AB%A0%E3%81%94%E3%81%A8%E3%82%B9%E3%83%A9%E3%82%A4%E3%83%89%E4%B8%80%E5%BC%8F.zip" target="_blank" rel="noopener">章ごとスライド一式.zip</a>（PDF3本＋テキスト3本を同梱）</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>18ページの入力PDFが、3つの章に自動検出され、出力6ファイル（章ごとのPDF3本＋テキスト3本）とZIP1本が生成されました。headless Chromiumでの実測でコンソールエラーは0件です。</p>
+
+    <details>
+      <summary>「台本用テキストをコピー」で実際にコピーされる内容を見る（第2章の例）</summary>
+      <!-- SCRIPT_TEXT -->
+      <pre>以下は研修スライド「第2章 集客の基本」（全6ページ）の内容です。
+この内容をもとに、受講生向けの動画ナレーション台本を作ってください。
+条件: 話し言葉／1ページごとに区切る／専門用語は初出で一言補足／全体で約6分の長さ。
+
+---
+【ページ1】
+第2章 集客の基本
+
+【ページ2】
+スライド2: 本文の内容です。
+
+【ページ3】
+スライド3: 本文の内容です。
+
+【ページ4】
+スライド4: 本文の内容です。
+
+【ページ5】
+スライド5: 本文の内容です。
+
+【ページ6】
+スライド6: 本文の内容です。
+</pre>
+      <p class="caption">実物ファイル：<a href="assets/script_ch2_clipboard.txt" target="_blank" rel="noopener">script_ch2_clipboard.txt</a></p>
+    </details>
+  </section>
+
+  <!-- 6. Assurance -->
+  <section id="assurance">
+    <h2>安心ポイント</h2>
+    <ul class="list-clean">
+      <li>すべての処理はお使いのブラウザの中だけで完結します。PDFの中身が外部のサーバーに送信されることはありません。</li>
+      <li>ログイン・会員登録は不要です。URLを開けばすぐに使えます。</li>
+      <li>無料で利用できます。</li>
+      <li>ソースコードは公開されています。<a href="https://github.com/Ryoseiimai/slide-chapter-splitter" target="_blank" rel="noopener">GitHubで見る</a></li>
+    </ul>
+  </section>
+
+  <!-- 7. Things to know -->
+  <section id="knowledge">
+    <h2>知っておいてほしいこと</h2>
+    <ol class="knowledge">
+      <li>PowerPoint・Keynote・GoogleスライドはPDFに書き出してからアップロードしてください。</li>
+      <li>スキャン画像だけのPDF（文字情報を持たないPDF）は、文字を読み取れないため章の自動検出や台本テキストの抽出ができません。</li>
+      <li>目次ページが誤って1つの章として検出された場合は、区切り欄の該当する数字を消すことで正しい章立てに修正できます。</li>
+    </ol>
+  </section>
+
+  <footer>
+    <div class="fbox">
+      <p>制作：今井涼晴　／　2026年9月2日</p>
+      <p>ご要望があれば、この報告書のURLごと送り返してください。</p>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>
