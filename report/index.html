@@ -132,7 +132,17 @@
     background:var(--card);border-radius:8px;padding:24px;
   }
 
+  .doc-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .doc-card{
+    display:block;padding:24px;border-radius:8px;background:var(--card);
+    text-decoration:none;color:var(--fg);border:1px solid var(--line);
+  }
+  .doc-card h3{margin:0 0 8px;color:var(--fg);}
+  .doc-card p{margin:0 0 16px;color:var(--sub);font-size:16px;}
+  .doc-card .open{color:var(--accent);font-weight:700;}
+
   @media (max-width:600px){
+    .doc-grid{grid-template-columns:1fr;}
     .hero{padding:48px 0 40px;}
     .hero h1{font-size:28px;}
     section{padding:40px 0;}
@@ -154,6 +164,7 @@
     <div class="hero-buttons">
       <a class="btn btn-primary" href="https://ryoseiimai.github.io/slide-chapter-splitter/" target="_blank" rel="noopener">ツールを開く</a>
       <a class="btn btn-secondary" href="#demo">実演を見る（約15秒）</a>
+      <a class="btn btn-secondary" href="#docs">資料一式を見る</a>
     </div>
     <div class="hero-shot">
       <a href="assets/tool_hero.png" target="_blank" rel="noopener"><img src="assets/tool_hero.png" alt="ツールの初期画面"></a>
@@ -180,6 +191,34 @@
         </ul>
         <p class="note-inline">つまり①は、②の機能に組み込まれた「台本用テキストをコピー」ボタンで対応しています。別々の作業ではなく、1つの流れの中で両方解決します。</p>
       </div>
+    </div>
+  </section>
+
+  <!-- 2.5 Docs -->
+  <section id="docs">
+    <h2>資料一式</h2>
+    <p>操作を覚えたい方、この先を自動化したい方、社内で確認・共有したい方、それぞれ向けの資料をまとめました。</p>
+    <div class="doc-grid">
+      <a class="doc-card" href="howto/" target="_blank" rel="noopener">
+        <h3>使い方ガイド</h3>
+        <p>練習用PDFで3分。画面ごとに1アクション。</p>
+        <span class="open">開く →</span>
+      </a>
+      <a class="doc-card" href="automation/" target="_blank" rel="noopener">
+        <h3>全自動にする道すじ（Codex）</h3>
+        <p>PDFを置いて一言頼むだけにする計画と、AIに渡す手順書。</p>
+        <span class="open">開く →</span>
+      </a>
+      <a class="doc-card" href="automation/slide-script-automation-gamebook.md" target="_blank" rel="noopener">
+        <h3>Codex向け手順書（そのままAIに渡すファイル）</h3>
+        <p>あなたのAIに貼るだけ。</p>
+        <span class="open">開く →</span>
+      </a>
+      <a class="doc-card" href="handoff/" target="_blank" rel="noopener">
+        <h3>引き継ぎ書・レビューリスト</h3>
+        <p>チェックを付けて、そのまま送り返せます。</p>
+        <span class="open">開く →</span>
+      </a>
     </div>
   </section>
 

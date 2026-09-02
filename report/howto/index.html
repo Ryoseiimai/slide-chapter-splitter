@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>使い方ガイド | スライド章分割ツール</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent:#1a56db;
+    --text:#111111;
+    --sub:#555555;
+    --line:#e5e5e5;
+    --bg-soft:#f7f8fa;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Noto Sans JP", sans-serif;
+    color:var(--text);
+    background:#ffffff;
+    line-height:1.8;
+    font-size:18px;
+  }
+  .wrap{
+    max-width:880px;
+    margin:0 auto;
+    padding:32px 20px 80px;
+  }
+  h1{
+    font-size:28px;
+    font-weight:900;
+    margin:0 0 8px;
+  }
+  h2{
+    font-size:22px;
+    font-weight:700;
+    margin:56px 0 16px;
+    padding-bottom:8px;
+    border-bottom:2px solid var(--line);
+  }
+  h3{
+    font-size:19px;
+    font-weight:700;
+    margin:0 0 8px;
+  }
+  p{margin:0 0 12px;}
+  .lead{
+    color:var(--sub);
+    font-size:16px;
+    margin:0 0 24px;
+  }
+  .hero-box{
+    background:var(--bg-soft);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:24px;
+    margin:24px 0 40px;
+  }
+  .hero-box p{font-size:19px; font-weight:500;}
+  .btn{
+    display:inline-block;
+    background:var(--accent);
+    color:#ffffff;
+    text-decoration:none;
+    font-weight:700;
+    padding:14px 24px;
+    border-radius:8px;
+    margin:8px 8px 0 0;
+    font-size:17px;
+  }
+  .btn.secondary{
+    background:#ffffff;
+    color:var(--accent);
+    border:2px solid var(--accent);
+    padding:12px 22px;
+  }
+  .step-num{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    background:var(--accent);
+    color:#fff;
+    font-weight:700;
+    font-size:16px;
+    margin-right:10px;
+    flex-shrink:0;
+  }
+  .step-title{
+    display:flex;
+    align-items:center;
+    margin-bottom:14px;
+  }
+  .step-title h2{
+    border-bottom:none;
+    margin:0;
+    padding:0;
+  }
+  figure{
+    margin:0 0 16px;
+  }
+  figure img{
+    width:100%;
+    height:auto;
+    display:block;
+    border:1px solid var(--line);
+    border-radius:8px;
+    cursor:zoom-in;
+  }
+  figcaption{
+    font-size:14px;
+    color:var(--sub);
+    margin-top:6px;
+  }
+  .do-happen{
+    background:var(--bg-soft);
+    border-left:4px solid var(--accent);
+    padding:14px 18px;
+    border-radius:0 8px 8px 0;
+    margin:0 0 8px;
+  }
+  .do-happen .label{
+    font-weight:700;
+    color:var(--accent);
+    margin-right:4px;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:16px;
+  }
+  .table-wrap{
+    overflow-x:auto;
+    margin:16px 0;
+  }
+  th,td{
+    border:1px solid var(--line);
+    padding:10px 12px;
+    text-align:left;
+    white-space:nowrap;
+  }
+  th{
+    background:var(--bg-soft);
+    font-weight:700;
+  }
+  .prep-item{
+    margin-bottom:14px;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--line);
+  }
+  .prep-item:last-child{border-bottom:none;}
+  .note{
+    font-size:14px;
+    color:var(--sub);
+    margin-top:24px;
+  }
+  .flow{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+  .flow-item{
+    background:var(--bg-soft);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:16px 18px;
+  }
+  .flow-item .step-num{margin-bottom:8px;}
+  .sample-text{
+    background:#ffffff;
+    border:1px dashed #999999;
+    border-radius:6px;
+    padding:12px 14px;
+    font-size:15px;
+    color:var(--sub);
+    margin-top:8px;
+  }
+  details{
+    border:1px solid var(--line);
+    border-radius:8px;
+    margin-bottom:12px;
+    padding:14px 18px;
+  }
+  summary{
+    font-weight:700;
+    cursor:pointer;
+    font-size:17px;
+  }
+  details p{
+    margin:10px 0 0;
+    color:var(--sub);
+    font-size:16px;
+  }
+  video{
+    width:100%;
+    border-radius:8px;
+    border:1px solid var(--line);
+  }
+  footer{
+    margin-top:64px;
+    padding-top:24px;
+    border-top:1px solid var(--line);
+    font-size:14px;
+    color:var(--sub);
+  }
+  footer a{color:var(--accent);}
+  a{color:var(--accent);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>スライド章分割ツール 使い方ガイド</h1>
+  <p class="lead">研修用スライドのPDFを、章ごとに自動で分けて保存できるツールです。図を見ながら、そのとおりに操作すれば使えます。</p>
+
+  <div class="hero-box">
+    <p>まず練習用PDFで1回やってみてください（3分）。</p>
+    <a class="btn" href="../assets/input_sample_ja.pdf" download>練習用PDFをダウンロード</a>
+    <a class="btn secondary" href="https://ryoseiimai.github.io/slide-chapter-splitter/" target="_blank" rel="noopener">ツールを開く</a>
+  </div>
+
+  <h2>0. 事前準備：スライドをPDFにする</h2>
+  <p>このツールはPDFファイルしか読み込めません。まずお使いのソフトでPDFに書き出してください。お使いのバージョンによってメニューの表記が違うことがあります。</p>
+
+  <div class="prep-item">
+    <h3>PowerPointの場合</h3>
+    <p>「ファイル」→「エクスポート」→「PDF/XPSドキュメントの作成」を選ぶ。</p>
+  </div>
+  <div class="prep-item">
+    <h3>Keynoteの場合</h3>
+    <p>「ファイル」→「書き出す」→「PDF」を選ぶ。</p>
+  </div>
+  <div class="prep-item">
+    <h3>Googleスライドの場合</h3>
+    <p>「ファイル」→「ダウンロード」→「PDF文書（.pdf）」を選ぶ。</p>
+  </div>
+
+  <h2>ステップ1：PDFを選ぶ</h2>
+  <div class="do-happen">
+    <p><span class="label">やること：</span>「PDFを選ぶ」の枠にファイルをドラッグ＆ドロップするか、クリックしてファイルを選びます。</p>
+    <p><span class="label">起きること：</span>PDFが読み込まれ、画面が次の章確認画面に切り替わります。</p>
+  </div>
+  <figure>
+    <a href="../assets/tool_hero.png" target="_blank" rel="noopener">
+      <img src="../assets/tool_hero.png" alt="ツールの初期画面。PDFを選ぶ枠が表示されている">
+    </a>
+    <figcaption>クリックすると原寸で新しいタブに開きます。</figcaption>
+  </figure>
+
+  <h2>ステップ2：章の区切りを確認・修正する</h2>
+  <div class="do-happen">
+    <p><span class="label">やること：</span>自動で検出された章の一覧（章番号・開始ページ・終了ページ・タイトル候補）を見て、間違っていたら「区切りページ番号（カンマ区切り。例: 1, 15, 42, 88）」の欄に正しいページ番号を入力し、「反映」ボタンを押します。</p>
+    <p><span class="label">起きること：</span>入力した番号で章の区切りが引き直され、表の内容が更新されます。</p>
+  </div>
+  <figure>
+    <a href="../assets/check_01_detect.png" target="_blank" rel="noopener">
+      <img src="../assets/check_01_detect.png" alt="自動で検出された章の一覧表">
+    </a>
+    <figcaption>まずは自動検出の結果を確認します。</figcaption>
+  </figure>
+  <figure>
+    <a href="../assets/check_02_manual.png" target="_blank" rel="noopener">
+      <img src="../assets/check_02_manual.png" alt="区切りページ番号を手動で入力している画面">
+    </a>
+    <figcaption>おかしい場合はページ番号を入力して「反映」を押します。</figcaption>
+  </figure>
+
+  <h2>ステップ3：章ごとに保存・コピーする</h2>
+  <div class="do-happen">
+    <p><span class="label">やること：</span>各章カードの「PDFを保存」で章ごとのPDFを、「台本用テキストをコピー」で文章をコピーできます。全部まとめて欲しいときは「全章をまとめてZIPで保存」を押します。</p>
+    <p><span class="label">起きること：</span>ボタンを押すとファイルがダウンロードされるか、「コピーしました」と表示されてクリップボードに文章がコピーされます。</p>
+  </div>
+  <figure>
+    <a href="../assets/check_03_full.png" target="_blank" rel="noopener">
+      <img src="../assets/check_03_full.png" alt="章ごとのカードが3枚並んだ画面。各カードに保存・コピーのボタンがある">
+    </a>
+    <figcaption>章の数だけカードが並びます。</figcaption>
+  </figure>
+
+  <h2>台本づくりへの繋ぎ方</h2>
+  <p>「台本用テキストをコピー」したら、ChatGPTなどのAIに貼り付けるだけで、ナレーション台本の下書きができます。</p>
+  <div class="flow">
+    <div class="flow-item">
+      <span class="step-num">1</span>
+      <p>章カードの「台本用テキストをコピー」を押す。</p>
+    </div>
+    <div class="flow-item">
+      <span class="step-num">2</span>
+      <p>ChatGPTなどの入力欄に貼り付ける（Ctrl+V／⌘V）。</p>
+      <div class="sample-text">貼り付けると、たとえばこんな文章が入っています。<br>「以下は研修スライド『第2章 集客の基本』（全12ページ）の内容です。この内容をもとに、受講生向けの動画ナレーション台本を作ってください。」</div>
+    </div>
+    <div class="flow-item">
+      <span class="step-num">3</span>
+      <p>そのまま送信する。台本の下書きが返ってきます。</p>
+    </div>
+  </div>
+
+  <h2>うまくいかないとき</h2>
+
+  <details>
+    <summary>章が1つしか出てこない</summary>
+    <p>スライドに章の区切りとなる見出しページがないと、自動検出できないことがあります。ステップ2の「区切りページ番号」に、章の始まりのページ番号を自分で入力して「反映」を押してください。</p>
+  </details>
+
+  <details>
+    <summary>章が多すぎる（目次ページも章として拾われた）</summary>
+    <p>目次や表紙のページが誤って区切りとして検出されることがあります。ステップ2で不要な区切りを外し、正しいページ番号だけをカンマ区切りで入力して「反映」を押してください。</p>
+  </details>
+
+  <details>
+    <summary>「文字が取れない」という警告が出る</summary>
+    <p>スライドが画像として書き出されていると、文字情報を読み取れません。元のPowerPointやGoogleスライドから、テキストを含む形でPDFに書き出し直してください。</p>
+  </details>
+
+  <details>
+    <summary>PowerPointのファイルのまま入れられない</summary>
+    <p>このツールはPDFのみに対応しています。事前準備の欄を参考に、まずPDFに書き出してから読み込んでください。</p>
+  </details>
+
+  <details>
+    <summary>保存したファイルはどこに入るの？</summary>
+    <p>お使いのブラウザのダウンロード先フォルダに保存されます。多くの場合「ダウンロード」フォルダです。保存先を毎回選びたい場合は、ブラウザの設定で「ダウンロード前に保存先を確認する」をオンにしてください。</p>
+  </details>
+
+  <h2>実演動画（15秒）</h2>
+  <video controls poster="../assets/demo_poster.png">
+    <source src="../assets/demo.mp4" type="video/mp4">
+    お使いのブラウザは動画の再生に対応していません。
+  </video>
+
+  <footer>
+    <p>データはブラウザ内だけで処理され、外部には送信されません。</p>
+    <p>作成: 今井涼晴　2026-09-02</p>
+    <p><a href="../">報告書トップへ戻る</a></p>
+  </footer>
+
+</div>
+</body>
+</html>

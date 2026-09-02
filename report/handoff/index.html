@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>引き継ぎ書 | スライド章分割ツール</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent:#1a56db;
+    --bg:#ffffff;
+    --fg:#111111;
+    --sub:#555555;
+    --line:#e2e2e2;
+    --card:#f7f7f8;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:"Noto Sans JP", -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+    background:var(--bg);
+    color:var(--fg);
+    margin:0;
+    padding:0 0 100px;
+    font-size:18px;
+    line-height:1.8;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:0 24px;}
+  a{color:var(--accent);}
+
+  header.hero{padding:56px 0 40px;border-bottom:1px solid var(--line);}
+  header.hero h1{font-size:32px;font-weight:900;line-height:1.4;margin:0 0 16px;}
+  header.hero .meta{color:var(--sub);font-size:16px;margin:0 0 8px;}
+  header.hero .lead{font-size:18px;color:var(--fg);margin:20px 0 0;padding:16px;background:var(--card);border-radius:8px;}
+
+  section{padding:48px 0;border-bottom:1px solid var(--line);}
+  section:last-of-type{border-bottom:none;}
+  h2{font-size:24px;font-weight:900;margin:0 0 24px;padding-left:14px;border-left:6px solid var(--accent);}
+  h3{font-size:19px;font-weight:700;margin:32px 0 12px;}
+
+  table{width:100%;border-collapse:collapse;margin-top:8px;}
+  th,td{text-align:left;padding:14px 12px;border-bottom:1px solid var(--line);vertical-align:top;font-size:16px;}
+  th{background:var(--card);font-weight:700;}
+  td a{font-weight:700;}
+
+  .qa{background:var(--card);border-radius:8px;padding:20px 24px;margin-bottom:20px;}
+  .qa p{margin:0 0 8px;}
+  .qa .q{font-weight:700;}
+  .qa .a{color:var(--fg);}
+
+  .checklist-section{background:var(--card);border-radius:10px;padding:24px;margin-bottom:24px;}
+  .checklist-section h3{margin-top:0;}
+  .item{display:flex;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:1px solid var(--line);}
+  .item:last-of-type{border-bottom:none;}
+  .item input[type="checkbox"]{
+    width:26px;height:26px;flex:none;margin-top:2px;accent-color:var(--accent);cursor:pointer;
+  }
+  .item label{cursor:pointer;font-size:17px;flex:1;}
+  .free-text{margin-top:8px;margin-left:40px;}
+  .free-text input[type="text"]{
+    width:100%;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:6px;font-family:inherit;
+  }
+  textarea.memo{
+    width:100%;min-height:90px;font-size:16px;padding:12px;border:1px solid var(--line);border-radius:6px;
+    font-family:inherit;margin-top:12px;resize:vertical;
+  }
+  .memo-label{font-size:15px;color:var(--sub);margin:16px 0 4px;font-weight:700;}
+
+  .btn{
+    display:inline-block;padding:14px 24px;border-radius:8px;font-size:16px;font-weight:700;
+    text-decoration:none;text-align:center;cursor:pointer;border:none;
+  }
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-outline{background:#fff;color:var(--accent);border:2px solid var(--accent);}
+  .btn-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px;}
+
+  ul.limit-list{padding-left:22px;margin:0;}
+  ul.limit-list li{margin-bottom:12px;}
+
+  ol.next-steps{padding-left:22px;margin:0;}
+  ol.next-steps li{margin-bottom:16px;}
+  ol.next-steps .tag{
+    display:inline-block;background:var(--accent);color:#fff;font-size:13px;font-weight:700;
+    padding:2px 8px;border-radius:4px;margin-right:8px;
+  }
+
+  #copy-result{
+    width:100%;min-height:200px;font-size:14px;font-family:monospace;padding:12px;
+    border:1px solid var(--line);border-radius:6px;margin-top:16px;white-space:pre-wrap;display:none;
+  }
+  .copy-status{font-size:15px;color:var(--sub);margin-top:10px;min-height:22px;}
+
+  footer{padding:40px 0;color:var(--sub);font-size:15px;}
+  footer table{margin-top:12px;}
+  footer th,footer td{font-size:14px;padding:10px 8px;}
+
+  @media (max-width:600px){
+    header.hero h1{font-size:26px;}
+    h2{font-size:21px;}
+    .free-text{margin-left:0;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hero">
+    <h1>引き継ぎ書</h1>
+    <p class="meta">宛先: りょうすけさん</p>
+    <p class="meta">作成者: 今井涼晴</p>
+    <p class="meta">作成日: 2026年9月2日</p>
+    <p class="lead">この1ページに、納品物・ご相談の対応状況・受け入れレビュー・限界・次の一手まで、すべての入口があります。上から順に見ていただければ全体像がわかります。</p>
+  </header>
+
+  <section id="deliverables">
+    <h2>納品物一覧</h2>
+    <table>
+      <thead>
+        <tr><th>名前</th><th>何のためのもの</th><th>開く</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>報告書トップ</td>
+          <td>今回の納品全体の説明ページ</td>
+          <td><a href="../" target="_blank" rel="noopener">開く</a></td>
+        </tr>
+        <tr>
+          <td>ツール本体</td>
+          <td>PDFをアップロードして章ごとに分割・台本テキストを作る本体</td>
+          <td><a href="https://ryoseiimai.github.io/slide-chapter-splitter/" target="_blank" rel="noopener">開く</a></td>
+        </tr>
+        <tr>
+          <td>使い方ガイド</td>
+          <td>ツールの操作手順を画面つきで説明</td>
+          <td><a href="../howto/" target="_blank" rel="noopener">開く</a></td>
+        </tr>
+        <tr>
+          <td>自動化の報告書（人向け）</td>
+          <td>台本作成を自動化する仕組みの説明</td>
+          <td><a href="../automation/" target="_blank" rel="noopener">開く</a></td>
+        </tr>
+        <tr>
+          <td>Codex向け手順書</td>
+          <td>自動化を実装するAI（Codex）に渡す作業手順書</td>
+          <td><a href="../automation/slide-script-automation-gamebook.md" target="_blank" rel="noopener">開く</a></td>
+        </tr>
+        <tr>
+          <td>実物素材</td>
+          <td>練習用PDF・章ごとスライド一式・デモ動画</td>
+          <td>
+            <a href="../assets/input_sample_ja.pdf" target="_blank" rel="noopener">練習用PDF</a> /
+            <a href="../assets/章ごとスライド一式.zip" target="_blank" rel="noopener">ZIP一式</a> /
+            <a href="../assets/demo.mp4" target="_blank" rel="noopener">デモ動画</a>
+          </td>
+        </tr>
+        <tr>
+          <td>ソースコード</td>
+          <td>ツールのプログラム本体（GitHub）</td>
+          <td><a href="https://github.com/Ryoseiimai/slide-chapter-splitter" target="_blank" rel="noopener">開く</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="qa">
+    <h2>ご相談内容と、それぞれどうなったか</h2>
+    <div class="qa">
+      <p class="q">① スライドから台本用テキストへのコピペが手間</p>
+      <p class="a">ツールの「台本用テキストをコピー」ボタンで、1章1クリックでコピーできるようにしました。さらに、コピー作業自体をなくす全自動化はCodex向け手順書に手順をまとめてあります。</p>
+    </div>
+    <div class="qa">
+      <p class="q">② 350枚のスライドが章をまたいで一続きになっている</p>
+      <p class="a">ツールがスライドの内容から章の区切りを自動検出し、章ごとのPDF・テキスト・ZIPに分割できるようにしました。区切りがずれた場合は手で直せます。</p>
+    </div>
+  </section>
+
+  <section id="checklist">
+    <h2>受け入れレビューリスト</h2>
+    <p>チェックとメモはこのブラウザに自動保存されます（他の人には送信されません）。確認しながら気づいた点を書き込んでください。</p>
+
+    <div class="checklist-section" data-section="A">
+      <h3>A. ツール本体</h3>
+      <div class="item"><input type="checkbox" id="a1"><label for="a1">練習用PDFで3章に分かれた</label></div>
+      <div class="item"><input type="checkbox" id="a2"><label for="a2">自分の実スライドPDFで章が検出された</label></div>
+      <div class="item"><input type="checkbox" id="a3"><label for="a3">区切りを手で直して反映できた</label></div>
+      <div class="item"><input type="checkbox" id="a4"><label for="a4">章PDFを保存して開けた</label></div>
+      <div class="item"><input type="checkbox" id="a5"><label for="a5">台本用テキストをChatGPT等に貼れた</label></div>
+      <div class="item"><input type="checkbox" id="a6"><label for="a6">ZIPで一括保存できた</label></div>
+      <p class="memo-label">メモ（Aについて）</p>
+      <textarea class="memo" id="memo-a" placeholder="気づいたことがあれば自由に書いてください"></textarea>
+    </div>
+
+    <div class="checklist-section" data-section="B">
+      <h3>B. 実スライドで気になる点</h3>
+      <div class="item"><input type="checkbox" id="b1"><label for="b1">章が多すぎ・少なすぎ</label></div>
+      <div class="free-text"><input type="text" id="b1-text" placeholder="具体的にどうだったか（任意）"></div>
+      <div class="item"><input type="checkbox" id="b2"><label for="b2">タイトル候補がずれる</label></div>
+      <div class="free-text"><input type="text" id="b2-text" placeholder="具体的にどうだったか（任意）"></div>
+      <div class="item"><input type="checkbox" id="b3"><label for="b3">文字が取れないページがある</label></div>
+      <div class="free-text"><input type="text" id="b3-text" placeholder="具体的にどうだったか（任意）"></div>
+      <div class="item"><input type="checkbox" id="b4"><label for="b4">ファイル名が使いにくい</label></div>
+      <div class="free-text"><input type="text" id="b4-text" placeholder="具体的にどうだったか（任意）"></div>
+      <p class="memo-label">メモ（Bについて）</p>
+      <textarea class="memo" id="memo-b" placeholder="気づいたことがあれば自由に書いてください"></textarea>
+    </div>
+
+    <div class="checklist-section" data-section="C">
+      <h3>C. 台本の質</h3>
+      <div class="item"><input type="checkbox" id="c1"><label for="c1">台本の文体は合っているか</label></div>
+      <div class="item"><input type="checkbox" id="c2"><label for="c2">長さは適切か</label></div>
+      <div class="item"><input type="checkbox" id="c3"><label for="c3">専門用語の補足は要るか</label></div>
+      <p class="memo-label">メモ（Cについて）</p>
+      <textarea class="memo" id="memo-c" placeholder="気づいたことがあれば自由に書いてください"></textarea>
+    </div>
+
+    <div class="checklist-section" data-section="D">
+      <h3>D. 自動化の準備</h3>
+      <div class="item"><input type="checkbox" id="d1"><label for="d1">Codexが使える環境があるか</label></div>
+      <div class="item"><input type="checkbox" id="d2"><label for="d2">スライドに受講生名・売上等が入っているか（入っているなら除外方針を決める）</label></div>
+      <div class="item"><input type="checkbox" id="d3"><label for="d3">台本の出し先（UTAGE等）は決まっているか</label></div>
+      <div class="item"><input type="checkbox" id="d4"><label for="d4">1章目で試す章を決めたか</label></div>
+      <p class="memo-label">メモ（Dについて）</p>
+      <textarea class="memo" id="memo-d" placeholder="気づいたことがあれば自由に書いてください"></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button type="button" class="btn btn-outline" id="clear-btn">すべてクリア</button>
+    </div>
+  </section>
+
+  <section id="limits">
+    <h2>知っておいてほしい限界</h2>
+    <ul class="limit-list">
+      <li>PPTXファイルは直接扱えません。PDFに書き出してから使ってください。</li>
+      <li>画像として保存されたPDF（スキャンなど）は文字を読み取れません。</li>
+      <li>目次ページを章の区切りとして誤検出することがあります。手で外してください。</li>
+      <li>本文中に「第N章」という語が出てくると、区切りが余分に増えることがあります。</li>
+      <li>ツールの利用にはネット接続が必要です（画面の部品をネットから読み込んでいます）。</li>
+    </ul>
+  </section>
+
+  <section id="next-steps">
+    <h2>次の一手（提案）</h2>
+    <ol class="next-steps">
+      <li><span class="tag">優先1</span>実際のスライド1本で、今日試してみる。</li>
+      <li><span class="tag">優先2</span>1章ぶんの台本をChatGPTで作ってみて、文体を固める。</li>
+      <li><span class="tag">優先3</span>Codex向け手順書を使って、自動化に着手する。</li>
+    </ol>
+  </section>
+
+  <section id="feedback">
+    <h2>フィードバックの返し方</h2>
+    <p>このページのチェックとメモを埋めたら、下の「ページ全体をコピー」ボタンを押してください。チェック状態とメモが文字になってクリップボードにコピーされます。そのままメールやチャットに貼って送ってください。</p>
+    <div class="btn-row">
+      <button type="button" class="btn btn-primary" id="copy-btn">ページ全体をコピー</button>
+    </div>
+    <p class="copy-status" id="copy-status"></p>
+    <textarea id="copy-result" readonly></textarea>
+  </section>
+
+  <footer>
+    <h2 style="font-size:18px;border-left:none;padding-left:0;">更新履歴</h2>
+    <table>
+      <thead><tr><th>日付</th><th>内容</th></tr></thead>
+      <tbody>
+        <tr><td>2026-09-02</td><td>初版: ツール公開・報告書・使い方・自動化手順書・引き継ぎ書</td></tr>
+      </tbody>
+    </table>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var STORAGE_PREFIX = "handoff_v1_";
+  var sections = {
+    A: { checkboxes: ["a1","a2","a3","a4","a5","a6"], memo: "memo-a" },
+    B: { checkboxes: ["b1","b2","b3","b4"], texts: ["b1-text","b2-text","b3-text","b4-text"], memo: "memo-b" },
+    C: { checkboxes: ["c1","c2","c3"], memo: "memo-c" },
+    D: { checkboxes: ["d1","d2","d3","d4"], memo: "memo-d" }
+  };
+
+  function storageGet(key){
+    try {
+      return window.localStorage.getItem(STORAGE_PREFIX + key);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function storageSet(key, value){
+    try {
+      window.localStorage.setItem(STORAGE_PREFIX + key, value);
+    } catch (e) {
+      // localStorageが使えない環境でも動作は継続する
+    }
+  }
+
+  function storageRemove(key){
+    try {
+      window.localStorage.removeItem(STORAGE_PREFIX + key);
+    } catch (e) {
+      // 何もしない
+    }
+  }
+
+  function restoreState(){
+    Object.keys(sections).forEach(function(key){
+      var conf = sections[key];
+      conf.checkboxes.forEach(function(id){
+        var el = document.getElementById(id);
+        if (!el) return;
+        var saved = storageGet(id);
+        if (saved === "1") el.checked = true;
+      });
+      (conf.texts || []).forEach(function(id){
+        var el = document.getElementById(id);
+        if (!el) return;
+        var saved = storageGet(id);
+        if (saved !== null) el.value = saved;
+      });
+      var memoEl = document.getElementById(conf.memo);
+      if (memoEl) {
+        var savedMemo = storageGet(conf.memo);
+        if (savedMemo !== null) memoEl.value = savedMemo;
+      }
+    });
+  }
+
+  function bindEvents(){
+    Object.keys(sections).forEach(function(key){
+      var conf = sections[key];
+      conf.checkboxes.forEach(function(id){
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener("change", function(){
+          storageSet(id, el.checked ? "1" : "0");
+        });
+      });
+      (conf.texts || []).forEach(function(id){
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener("input", function(){
+          storageSet(id, el.value);
+        });
+      });
+      var memoEl = document.getElementById(conf.memo);
+      if (memoEl) {
+        memoEl.addEventListener("input", function(){
+          storageSet(conf.memo, memoEl.value);
+        });
+      }
+    });
+  }
+
+  function clearAll(){
+    Object.keys(sections).forEach(function(key){
+      var conf = sections[key];
+      conf.checkboxes.forEach(function(id){
+        var el = document.getElementById(id);
+        if (el) el.checked = false;
+        storageRemove(id);
+      });
+      (conf.texts || []).forEach(function(id){
+        var el = document.getElementById(id);
+        if (el) el.value = "";
+        storageRemove(id);
+      });
+      var memoEl = document.getElementById(conf.memo);
+      if (memoEl) memoEl.value = "";
+      storageRemove(conf.memo);
+    });
+  }
+
+  function labelTextFor(id){
+    var label = document.querySelector('label[for="' + id + '"]');
+    return label ? label.textContent.trim() : id;
+  }
+
+  function buildReportText(){
+    var lines = [];
+    lines.push("引き継ぎ書レビュー結果");
+    lines.push("宛先: りょうすけさん / 作成者: 今井涼晴 / 作成日: 2026-09-02");
+    lines.push("");
+
+    var sectionTitles = {
+      A: "A. ツール本体",
+      B: "B. 実スライドで気になる点",
+      C: "C. 台本の質",
+      D: "D. 自動化の準備"
+    };
+
+    Object.keys(sections).forEach(function(key){
+      var conf = sections[key];
+      lines.push("【" + sectionTitles[key] + "】");
+      conf.checkboxes.forEach(function(id){
+        var el = document.getElementById(id);
+        var checked = el && el.checked;
+        lines.push((checked ? "[x] " : "[ ] ") + labelTextFor(id));
+        if (conf.texts) {
+          var textId = id + "-text";
+          var textEl = document.getElementById(textId);
+          if (textEl && textEl.value.trim() !== "") {
+            lines.push("    → " + textEl.value.trim());
+          }
+        }
+      });
+      var memoEl = document.getElementById(conf.memo);
+      var memoVal = memoEl ? memoEl.value.trim() : "";
+      lines.push("メモ: " + (memoVal !== "" ? memoVal : "（なし）"));
+      lines.push("");
+    });
+
+    return lines.join("\n");
+  }
+
+  function setupClearButton(){
+    var btn = document.getElementById("clear-btn");
+    if (!btn) return;
+    btn.addEventListener("click", function(){
+      if (window.confirm("チェックとメモをすべてクリアします。よろしいですか？")) {
+        clearAll();
+      }
+    });
+  }
+
+  function setupCopyButton(){
+    var btn = document.getElementById("copy-btn");
+    var statusEl = document.getElementById("copy-status");
+    var resultEl = document.getElementById("copy-result");
+    if (!btn) return;
+
+    btn.addEventListener("click", function(){
+      var text = buildReportText();
+
+      function showFallback(message){
+        resultEl.value = text;
+        resultEl.style.display = "block";
+        resultEl.focus();
+        resultEl.select();
+        statusEl.textContent = message;
+      }
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function(){
+          statusEl.textContent = "コピーしました。メールやチャットに貼り付けてください。";
+          resultEl.style.display = "none";
+        }, function(){
+          showFallback("自動コピーに失敗しました。下の欄が選択済みなので、そのままコピーしてください。");
+        });
+      } else {
+        showFallback("このブラウザは自動コピーに対応していません。下の欄が選択済みなので、そのままコピーしてください。");
+      }
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", function(){
+    restoreState();
+    bindEvents();
+    setupClearButton();
+    setupCopyButton();
+  });
+})();
+</script>
+
+</body>
+</html>

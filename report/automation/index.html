@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>スライドから台本まで、全自動にする道すじ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent:#1a56db;
+    --bg:#ffffff;
+    --fg:#111111;
+    --sub:#555555;
+    --line:#e2e2e2;
+    --card:#f7f7f8;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:"Noto Sans JP", -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+    background:var(--bg);
+    color:var(--fg);
+    margin:0;
+    padding:0 0 100px;
+    font-size:18px;
+    line-height:1.85;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:0 20px;}
+  a{color:var(--accent);}
+
+  header.hero{padding:56px 0 40px;border-bottom:1px solid var(--line);}
+  header.hero h1{font-size:32px;font-weight:900;line-height:1.5;margin:0 0 18px;}
+  header.hero .lead{font-size:18px;color:var(--sub);margin:0;}
+
+  section{padding:44px 0;border-bottom:1px solid var(--line);}
+  section:last-of-type{border-bottom:none;}
+  h2{font-size:24px;font-weight:700;margin:0 0 20px;}
+  h3{font-size:18px;font-weight:700;margin:0 0 8px;}
+  p{margin:0 0 14px;}
+
+  /* 今と後の比較図 */
+  .compare{display:flex;gap:20px;flex-wrap:wrap;}
+  .compare .col{flex:1 1 260px;}
+  .col-title{font-weight:700;font-size:16px;margin-bottom:12px;padding:8px 12px;border-radius:6px;background:var(--card);}
+  .col-title.now{color:var(--sub);}
+  .col-title.after{color:var(--accent);background:#eaf0fd;}
+  .step{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:12px 14px;
+    margin-bottom:6px;
+    font-size:15px;
+  }
+  .step.after{border-color:#c7d7f9;}
+  .arrow-down{
+    text-align:center;
+    color:var(--sub);
+    font-size:14px;
+    margin:2px 0 6px;
+  }
+  .compare-note{font-size:14px;color:var(--sub);margin-top:16px;}
+
+  /* Codexとは */
+  .info-box{
+    background:var(--card);
+    border-left:3px solid var(--accent);
+    padding:16px 18px;
+    border-radius:0 6px 6px 0;
+    font-size:16px;
+  }
+  .info-box .note{font-size:14px;color:var(--sub);margin-top:8px;margin-bottom:0;}
+
+  /* 3段階 */
+  .stage-card{
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:20px 22px;
+    margin-bottom:16px;
+  }
+  .stage-card .stage-num{
+    display:inline-block;
+    background:var(--accent);
+    color:#fff;
+    font-size:13px;
+    font-weight:700;
+    padding:3px 10px;
+    border-radius:999px;
+    margin-bottom:10px;
+  }
+  .stage-row{margin:6px 0;font-size:16px;}
+  .stage-row .label{font-weight:700;display:inline-block;min-width:7.5em;}
+
+  /* 手順書の使い方 */
+  .action-box{
+    background:var(--card);
+    border-radius:10px;
+    padding:22px;
+    margin:18px 0;
+  }
+  .action-box .filename{
+    font-family:"Noto Sans JP", monospace;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:6px 10px;
+    display:inline-block;
+    font-size:15px;
+  }
+  .btn-row{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0;}
+  .btn{
+    display:inline-block;
+    padding:12px 22px;
+    border-radius:8px;
+    font-weight:700;
+    font-size:16px;
+    text-decoration:none;
+    cursor:pointer;
+    border:none;
+  }
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-secondary{background:#fff;color:var(--accent);border:1px solid var(--accent);}
+  #copy-status{font-size:14px;color:var(--sub);margin-top:8px;min-height:1.4em;}
+
+  ul.promise{list-style:none;padding:0;margin:14px 0 0;}
+  ul.promise li{
+    padding:10px 0 10px 30px;
+    position:relative;
+    font-size:16px;
+    border-top:1px solid var(--line);
+  }
+  ul.promise li:first-child{border-top:none;}
+  ul.promise li::before{
+    content:"✓";
+    position:absolute;
+    left:0;
+    top:10px;
+    color:var(--accent);
+    font-weight:700;
+  }
+
+  ul.plain{margin:0;padding-left:1.3em;}
+  ul.plain li{margin-bottom:10px;font-size:16px;}
+
+  footer{padding:40px 0 0;font-size:14px;color:var(--sub);}
+  footer a{margin-right:16px;}
+
+  @media (max-width:600px){
+    header.hero{padding:40px 0 28px;}
+    header.hero h1{font-size:26px;}
+    .compare{flex-direction:column;}
+    section{padding:32px 0;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>スライドから台本まで、全自動にする道すじ</h1>
+    <p class="lead">今の手作業（ツールで分割してコピーし、ChatGPTなどに貼って、保存する。これを章の数だけ繰り返す）が、「PDFを置いて一言頼む」だけになります。</p>
+  </div>
+</header>
+
+<section id="compare">
+  <div class="wrap">
+    <h2>今と、自動化したあと</h2>
+    <div class="compare">
+      <div class="col">
+        <div class="col-title now">今（章の数だけ繰り返す）</div>
+        <div class="step">① スライドPDFを開く</div>
+        <div class="arrow-down">↓</div>
+        <div class="step">② ツールで章ごとに分ける</div>
+        <div class="arrow-down">↓</div>
+        <div class="step">③ 章の中身をコピーする</div>
+        <div class="arrow-down">↓</div>
+        <div class="step">④ ChatGPTなどに貼り付ける</div>
+        <div class="arrow-down">↓</div>
+        <div class="step">⑤ 出てきた台本を確認する</div>
+        <div class="arrow-down">↓</div>
+        <div class="step">⑥ 台本を保存する</div>
+      </div>
+      <div class="col">
+        <div class="col-title after">自動化したあと</div>
+        <div class="step after">① PDFを決めた場所に置く</div>
+        <div class="arrow-down">↓</div>
+        <div class="step after">② 決めた一言で頼む</div>
+        <div class="arrow-down">↓</div>
+        <div class="step after" style="background:#eaf0fd;border-color:#c7d7f9;">章ごとのPDFと台本の下書きが、決めた場所に揃っている</div>
+      </div>
+    </div>
+    <p class="compare-note">今は①〜⑥を章の数だけ繰り返しますが、自動化したあとは①②を1回やるだけです。台本の最終チェックと、配信システムへ入れる作業は、これまでどおり人が行います。</p>
+  </div>
+</section>
+
+<section id="codex">
+  <div class="wrap">
+    <h2>Codexとは</h2>
+    <div class="info-box">
+      <p style="margin:0;">Codexは、ChatGPTを作っている会社(OpenAI)のAIです。あなたのパソコンの中のファイルを読んだり、新しく作ったりできます。ChatGPTの有料プランで使えます。</p>
+      <p class="note">※使えるプランや料金は変わることがあるので、最新の情報は公式サイトで確認してください。</p>
+    </div>
+  </div>
+</section>
+
+<section id="stages">
+  <div class="wrap">
+    <h2>進め方は3段階</h2>
+
+    <div class="stage-card">
+      <span class="stage-num">①</span>
+      <h3>1章だけ試す</h3>
+      <div class="stage-row"><span class="label">あなたがやること：</span>スライドPDFを渡し、質問に答える</div>
+      <div class="stage-row"><span class="label">AIがやること：</span>1章分だけ、章のPDFと台本の下書きを1本作る</div>
+      <div class="stage-row"><span class="label">次へ進む目安：</span>その台本を読んで「このまま使える」「直せば使える」と思えたら次へ</div>
+    </div>
+
+    <div class="stage-card">
+      <span class="stage-num">②</span>
+      <h3>全章まとめて</h3>
+      <div class="stage-row"><span class="label">あなたがやること：</span>章の区切りの一覧を確認し、違っていたら直す</div>
+      <div class="stage-row"><span class="label">AIがやること：</span>すべての章のPDFと台本の下書きを作る(量が多ければ数章ずつ)</div>
+      <div class="stage-row"><span class="label">次へ進む目安：</span>出来た台本を何本か開いて、狙いどおりの文体・長さになっていたら次へ</div>
+    </div>
+
+    <div class="stage-card">
+      <span class="stage-num">③</span>
+      <h3>一言で動く形にする</h3>
+      <div class="stage-row"><span class="label">あなたがやること：</span>新しい会話で、決めた一言で実際に頼んでみる</div>
+      <div class="stage-row"><span class="label">AIがやること：</span>その一言だけで、①②の流れを最初から動かす</div>
+      <div class="stage-row"><span class="label">次へ進む目安：</span>説明なしの一言で、いつもどおりの形が出来上がったら完了</div>
+    </div>
+  </div>
+</section>
+
+<section id="how-to-use">
+  <div class="wrap">
+    <h2>あなたに渡す手順書の使い方</h2>
+    <div class="action-box">
+      <p>この道すじを実際に進めるための手順書を用意しました。あなたが普段使っているAIに、そのまま渡してください。</p>
+      <p><span class="filename">slide-script-automation-gamebook.md</span></p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="./slide-script-automation-gamebook.md" target="_blank" rel="noopener">手順書を開く</a>
+        <button class="btn btn-secondary" id="copy-btn" type="button">本文をコピー</button>
+      </div>
+      <div id="copy-status"></div>
+
+      <h3 style="margin-top:24px;">渡すときの4つの約束</h3>
+      <ul class="promise">
+        <li>手順書の中身を、そのままAIに渡す(説明を加えず、そのまま)</li>
+        <li>途中でAIから質問されたら、答える</li>
+        <li>最後まで一気に走らせず、区切りごとに様子を見る</li>
+        <li>会話が途切れたら、手順書と、AIが書いた記録を一緒にもう一度渡す</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="human-tasks">
+  <div class="wrap">
+    <h2>全自動になっても、人がやること</h2>
+    <ul class="plain">
+      <li>出来上がった台本の最終チェック(内容が正しいか、実際に使える言い回しか)</li>
+      <li>配信システムや読み上げ先に、台本を実際に入れる作業</li>
+      <li>受講生の名前や事例が写っているスライドを、AIに渡してよいかの判断</li>
+    </ul>
+  </div>
+</section>
+
+<section id="know-before">
+  <div class="wrap">
+    <h2>知っておくべきこと</h2>
+    <ul class="plain">
+      <li>台本の質は、AIへの頼み方で決まります。1章目で「こういう話し方で」「この長さで」と文体を決めるのが一番の肝です</li>
+      <li>スライドが画像として貼り付けられているだけのPDFは、文字を読み取れないことがあります</li>
+      <li>クラウドのAIサービスを使う場合、スライドの内容がそのサービスに送られます</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>作成 今井涼晴 2026-09-02</p>
+    <a href="../">報告書トップへ</a>
+    <a href="https://ryoseiimai.github.io/slide-chapter-splitter/" target="_blank" rel="noopener">手作業ツール</a>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var btn = document.getElementById('copy-btn');
+  var status = document.getElementById('copy-status');
+
+  btn.addEventListener('click', function () {
+    status.textContent = '';
+    fetch('./slide-script-automation-gamebook.md')
+      .then(function (res) {
+        if (!res.ok) { throw new Error('fetch-failed'); }
+        return res.text();
+      })
+      .then(function (text) {
+        if (!navigator.clipboard || !navigator.clipboard.writeText) {
+          throw new Error('clipboard-unavailable');
+        }
+        return navigator.clipboard.writeText(text);
+      })
+      .then(function () {
+        status.textContent = 'コピーしました。AIに貼り付けてください。';
+      })
+      .catch(function () {
+        status.textContent = 'コピーできませんでした。上の「手順書を開く」からリンクを開き、全選択してコピーしてください。';
+      });
+  });
+})();
+</script>
+
+</body>
+</html>
