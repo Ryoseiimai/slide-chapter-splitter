@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>スライド章分割ツール</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<style>
+  :root{
+    --accent:#1a56db;
+    --bg:#ffffff;
+    --fg:#111111;
+    --sub:#555555;
+    --line:#dddddd;
+    --card:#f7f7f8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:-apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+    background:var(--bg);
+    color:var(--fg);
+    margin:0;
+    padding:0 0 80px 0;
+    font-size:16px;
+    line-height:1.7;
+  }
+  header{
+    padding:32px 20px 16px;
+    max-width:900px;
+    margin:0 auto;
+  }
+  h1{
+    font-size:24px;
+    margin:0 0 8px;
+  }
+  .lead{
+    color:var(--sub);
+    font-size:15px;
+    margin:0 0 4px;
+  }
+  .notice{
+    background:var(--card);
+    border-left:4px solid var(--accent);
+    padding:12px 16px;
+    margin:16px 0;
+    font-size:15px;
+  }
+  main{
+    max-width:900px;
+    margin:0 auto;
+    padding:0 20px;
+  }
+  section.step{
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:20px;
+    margin:20px 0;
+    background:var(--bg);
+  }
+  section.step h2{
+    font-size:19px;
+    margin:0 0 12px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .step-num{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    background:var(--accent);
+    color:#fff;
+    font-size:15px;
+    flex-shrink:0;
+  }
+  #drop-zone{
+    border:2px dashed var(--line);
+    border-radius:10px;
+    padding:40px 20px;
+    text-align:center;
+    color:var(--sub);
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  #drop-zone.dragover{
+    border-color:var(--accent);
+    background:#eef3fd;
+  }
+  button{
+    font-size:16px;
+    padding:12px 20px;
+    border-radius:8px;
+    border:1px solid var(--accent);
+    background:var(--accent);
+    color:#fff;
+    cursor:pointer;
+    font-weight:600;
+  }
+  button.secondary{
+    background:#fff;
+    color:var(--accent);
+  }
+  button:disabled{
+    opacity:.4;
+    cursor:not-allowed;
+  }
+  button:hover:not(:disabled){
+    filter:brightness(1.08);
+  }
+  input[type=text], input[type=number]{
+    font-size:16px;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    width:100%;
+  }
+  .row{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    align-items:center;
+    margin:10px 0;
+  }
+  .progress-wrap{
+    background:var(--card);
+    border-radius:8px;
+    height:10px;
+    overflow:hidden;
+    margin:12px 0;
+  }
+  .progress-bar{
+    height:100%;
+    background:var(--accent);
+    width:0%;
+    transition:width .1s;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:12px 0;
+    font-size:15px;
+  }
+  th,td{
+    border-bottom:1px solid var(--line);
+    padding:8px 6px;
+    text-align:left;
+  }
+  th{
+    color:var(--sub);
+    font-weight:600;
+  }
+  .cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+    gap:16px;
+    margin-top:16px;
+  }
+  .card{
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:16px;
+    background:var(--card);
+  }
+  .card h3{
+    margin:0 0 6px;
+    font-size:17px;
+  }
+  .card .meta{
+    color:var(--sub);
+    font-size:14px;
+    margin-bottom:10px;
+  }
+  .card .btns{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .card button{
+    width:100%;
+  }
+  .warn{
+    color:#b00020;
+    font-size:14px;
+    margin-top:8px;
+  }
+  .copied-flash{
+    color:var(--accent);
+    font-size:14px;
+    font-weight:600;
+    margin-top:6px;
+    display:none;
+  }
+  footer{
+    max-width:900px;
+    margin:40px auto 0;
+    padding:0 20px;
+    color:var(--sub);
+    font-size:14px;
+  }
+  footer ol{
+    padding-left:20px;
+  }
+  .hidden{ display:none !important; }
+  label{
+    font-size:15px;
+    color:var(--sub);
+    display:block;
+    margin-bottom:6px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>スライド章分割ツール</h1>
+  <p class="lead">350枚のスライドPDFを章ごとに分けて、動画台本づくり用のテキストをすぐコピーできます。</p>
+  <div class="notice">
+    PowerPoint・Keynote・Googleスライドをお使いの方は、まず「PDFで書き出し（エクスポート）」してから、そのPDFファイルをここで使ってください。
+  </div>
+</header>
+
+<main>
+
+  <!-- STEP 1 -->
+  <section class="step">
+    <h2><span class="step-num">1</span>PDFを選ぶ</h2>
+    <div id="drop-zone">
+      ここにPDFファイルをドラッグ＆ドロップ<br>
+      またはクリックしてファイルを選ぶ
+      <input type="file" id="file-input" accept="application/pdf" class="hidden">
+    </div>
+    <div id="load-progress-wrap" class="hidden">
+      <p id="load-progress-text">読み込み中… (0 / 0 ページ)</p>
+      <div class="progress-wrap"><div class="progress-bar" id="load-progress-bar"></div></div>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="step hidden" id="step2">
+    <h2><span class="step-num">2</span>章の区切りを確認・修正する</h2>
+    <p>自動で章の始まりを探しました。おかしいところがあれば、下の欄を直して「反映」を押してください。</p>
+    <table id="detect-table">
+      <thead><tr><th>章番号</th><th>開始ページ</th><th>終了ページ</th><th>タイトル候補</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <label for="split-pages-input">区切りページ番号（カンマ区切り。例: 1, 15, 42, 88）</label>
+    <div class="row">
+      <input type="text" id="split-pages-input">
+      <button id="apply-split-btn">反映</button>
+    </div>
+    <div id="no-detect-fallback" class="hidden">
+      <p>自動検出が0件でした。代わりに「何ページごとに区切るか」を指定してください。</p>
+      <label for="every-n-input">Nページごとに分割</label>
+      <div class="row">
+        <input type="number" id="every-n-input" min="1" value="10" style="max-width:120px;">
+        <button id="apply-every-n-btn">この設定で分割</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="step hidden" id="step3">
+    <h2><span class="step-num">3</span>章ごとに保存・コピーする</h2>
+    <div class="row">
+      <button id="zip-all-btn">全章をまとめてZIPで保存</button>
+    </div>
+    <div class="cards" id="cards-container"></div>
+  </section>
+
+</main>
+
+<footer>
+  <p><strong>使い方</strong></p>
+  <ol>
+    <li>スライドをPDFにして選ぶと、全ページの文字が読み込まれます。</li>
+    <li>章の区切りを確認し、必要なら手直しして「反映」します。</li>
+    <li>章ごとにPDFを保存するか、台本用のテキストをコピーしてChatGPTなどに貼り付けます。</li>
+  </ol>
+  <p>データはあなたのブラウザ内だけで処理され、どこにも送信されません。</p>
+</footer>
+
+<script>
+// 意図的な簡略化: PPTX/Keynote/Googleスライド形式には対応しない。
+// 限界: バイナリのPPTX等は読み込み不可。本格対応する場合は LibreOffice headless 等で
+// サーバサイド変換してからPDF化するステップを別途用意する必要がある。
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+const { PDFDocument } = PDFLib;
+
+const state = {
+  pdfBytes: null,
+  pageTexts: [],   // pageTexts[i] = テキスト (0-indexed, i = page i+1)
+  totalPages: 0,
+  chapters: []      // {num, start, end, title}
+};
+
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+const loadWrap = document.getElementById('load-progress-wrap');
+const loadText = document.getElementById('load-progress-text');
+const loadBar = document.getElementById('load-progress-bar');
+const step2 = document.getElementById('step2');
+const step3 = document.getElementById('step3');
+const detectTableBody = document.querySelector('#detect-table tbody');
+const splitPagesInput = document.getElementById('split-pages-input');
+const applySplitBtn = document.getElementById('apply-split-btn');
+const noDetectFallback = document.getElementById('no-detect-fallback');
+const everyNInput = document.getElementById('every-n-input');
+const applyEveryNBtn = document.getElementById('apply-every-n-btn');
+const cardsContainer = document.getElementById('cards-container');
+const zipAllBtn = document.getElementById('zip-all-btn');
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropZone.classList.remove('dragover');
+  const f = e.dataTransfer.files[0];
+  if (f) handleFile(f);
+});
+fileInput.addEventListener('change', (e) => {
+  const f = e.target.files[0];
+  if (f) handleFile(f);
+});
+
+async function handleFile(file) {
+  if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+    alert('PDFファイルを選んでください。');
+    return;
+  }
+  step2.classList.add('hidden');
+  step3.classList.add('hidden');
+  cardsContainer.innerHTML = '';
+  loadWrap.classList.remove('hidden');
+  loadText.textContent = '読み込み中… (0 / ? ページ)';
+  loadBar.style.width = '0%';
+
+  const arrayBuffer = await file.arrayBuffer();
+  state.pdfBytes = new Uint8Array(arrayBuffer);
+
+  const loadingTask = pdfjsLib.getDocument({ data: state.pdfBytes.slice() });
+  const pdf = await loadingTask.promise;
+  const total = pdf.numPages;
+  state.totalPages = total;
+  state.pageTexts = new Array(total).fill('');
+
+  for (let i = 1; i <= total; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    const text = content.items.map(it => it.str).join('\n');
+    state.pageTexts[i - 1] = text;
+    loadText.textContent = `読み込み中… (${i} / ${total} ページ)`;
+    loadBar.style.width = `${Math.round((i / total) * 100)}%`;
+  }
+
+  loadWrap.classList.add('hidden');
+  detectChapters();
+}
+
+// 章の始まりを検出する正規表現
+const CHAPTER_PATTERNS = [
+  /第\s*[0-9０-９一二三四五六七八九十百]+\s*[章部節講回]/,
+  /(Chapter|CHAPTER|Section|Lesson|Part)\s*\d+/,
+  /^(STEP|Step|ステップ)\s*[0-9０-９]+/
+];
+
+function normalizeTitle(t) {
+  return t.replace(/\s+/g, '').trim();
+}
+
+function findChapterMatch(text) {
+  const head = text.slice(0, 200);
+  const lines = head.split('\n').map(l => l.trim()).filter(Boolean);
+  for (const line of lines) {
+    for (const pat of CHAPTER_PATTERNS) {
+      const m = line.match(pat);
+      if (m) return line;
+    }
+  }
+  return null;
+}
+
+function detectChapters() {
+  const candidates = []; // {page, title}
+  let lastNormalized = null;
+
+  for (let i = 0; i < state.totalPages; i++) {
+    const pageNum = i + 1;
+    const match = findChapterMatch(state.pageTexts[i]);
+    if (pageNum === 1) {
+      // 1ページ目は常に区切り
+      candidates.push({ page: 1, title: match || '（表紙 / はじめ）' });
+      lastNormalized = match ? normalizeTitle(match) : null;
+      continue;
+    }
+    if (match) {
+      const norm = normalizeTitle(match);
+      if (norm === lastNormalized) continue; // 同一章タイトルの連続ページはスキップ
+      candidates.push({ page: pageNum, title: match });
+      lastNormalized = norm;
+    }
+  }
+
+  state.detectedSplitPages = candidates.map(c => c.page);
+  state.detectedTitles = candidates.map(c => c.title);
+
+  splitPagesInput.value = state.detectedSplitPages.join(', ');
+
+  // 検出0件（1ページ目のみ、かつタイトル無し）の場合はフォールバック表示
+  const realDetections = candidates.filter((c, idx) => idx > 0 || c.title !== '（表紙 / はじめ）');
+  if (state.totalPages > 1 && candidates.length <= 1) {
+    noDetectFallback.classList.remove('hidden');
+  } else {
+    noDetectFallback.classList.add('hidden');
+  }
+
+  buildChaptersFromSplitPages(state.detectedSplitPages, state.detectedTitles);
+  step2.classList.remove('hidden');
+}
+
+function buildChaptersFromSplitPages(splitPages, titles) {
+  // splitPages: 昇順・重複無しを保証
+  let pages = [...new Set(splitPages)].filter(p => p >= 1 && p <= state.totalPages).sort((a, b) => a - b);
+  if (pages.length === 0 || pages[0] !== 1) pages = [1, ...pages];
+
+  const chapters = [];
+  for (let i = 0; i < pages.length; i++) {
+    const start = pages[i];
+    const end = (i + 1 < pages.length) ? pages[i + 1] - 1 : state.totalPages;
+    let title = titles && titles[i] ? titles[i] : null;
+    if (!title) {
+      const auto = findChapterMatch(state.pageTexts[start - 1]);
+      title = auto || `第${i + 1}章`;
+    }
+    chapters.push({ num: i + 1, start, end, title });
+  }
+  state.chapters = chapters;
+  renderDetectTable();
+  renderCards();
+}
+
+function renderDetectTable() {
+  detectTableBody.innerHTML = '';
+  for (const ch of state.chapters) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${ch.num}</td><td>${ch.start}</td><td>${ch.end}</td><td>${escapeHtml(ch.title)}</td>`;
+    detectTableBody.appendChild(tr);
+  }
+}
+
+applySplitBtn.addEventListener('click', () => {
+  const raw = splitPagesInput.value;
+  const pages = raw.split(',').map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n));
+  if (pages.length === 0) {
+    alert('ページ番号をカンマ区切りで入力してください（例: 1, 15, 42）。');
+    return;
+  }
+  buildChaptersFromSplitPages(pages, null);
+});
+
+applyEveryNBtn.addEventListener('click', () => {
+  const n = parseInt(everyNInput.value, 10);
+  if (!n || n < 1) {
+    alert('1以上の数を入力してください。');
+    return;
+  }
+  const pages = [];
+  for (let p = 1; p <= state.totalPages; p += n) pages.push(p);
+  splitPagesInput.value = pages.join(', ');
+  buildChaptersFromSplitPages(pages, null);
+});
+
+function escapeHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function sanitizeFilename(name) {
+  let s = name.replace(/[\\/:*?"<>|]/g, '').trim();
+  if (s.length > 30) s = s.slice(0, 30);
+  if (!s) s = '無題';
+  return s;
+}
+
+function padNum(n) {
+  return String(n).padStart(2, '0');
+}
+
+function chapterFilenameBase(ch) {
+  return `${padNum(ch.num)}_${sanitizeFilename(ch.title)}`;
+}
+
+function buildScriptText(ch) {
+  const pageCount = ch.end - ch.start + 1;
+  const minutes = pageCount * 1;
+  let body = `以下は研修スライド「${ch.title}」（全${pageCount}ページ）の内容です。\n`;
+  body += `この内容をもとに、受講生向けの動画ナレーション台本を作ってください。\n`;
+  body += `条件: 話し言葉／1ページごとに区切る／専門用語は初出で一言補足／全体で約${minutes}分の長さ。\n\n`;
+  body += `---\n`;
+  for (let p = ch.start; p <= ch.end; p++) {
+    body += `【ページ${p - ch.start + 1}】\n`;
+    body += `${state.pageTexts[p - 1].trim()}\n\n`;
+  }
+  return body.trim() + '\n';
+}
+
+function chapterTextLength(ch) {
+  let total = 0;
+  for (let p = ch.start; p <= ch.end; p++) total += state.pageTexts[p - 1].trim().length;
+  return total;
+}
+
+async function buildChapterPdfBytes(ch) {
+  const srcDoc = await PDFDocument.load(state.pdfBytes);
+  const newDoc = await PDFDocument.create();
+  const indices = [];
+  for (let p = ch.start; p <= ch.end; p++) indices.push(p - 1);
+  const copiedPages = await newDoc.copyPages(srcDoc, indices);
+  copiedPages.forEach(pg => newDoc.addPage(pg));
+  return await newDoc.save();
+}
+
+function renderCards() {
+  cardsContainer.innerHTML = '';
+  for (const ch of state.chapters) {
+    const pageCount = ch.end - ch.start + 1;
+    const textLen = chapterTextLength(ch);
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <h3>${escapeHtml(ch.title)}</h3>
+      <div class="meta">第${ch.num}章 ／ ${ch.start}〜${ch.end}ページ（${pageCount}枚）</div>
+      <div class="btns">
+        <button class="save-pdf-btn secondary">PDFを保存</button>
+        <button class="copy-text-btn">台本用テキストをコピー</button>
+        <button class="save-text-btn secondary">テキストを保存(.txt)</button>
+      </div>
+      <div class="copied-flash">コピーしました</div>
+      ${textLen < 50 ? '<div class="warn">このPDFは画像化されていて文字が取れません。元のスライドから書き出し直すか、スライドの文字をコピーしてください。</div>' : ''}
+    `;
+    card.querySelector('.save-pdf-btn').addEventListener('click', async () => {
+      const btn = card.querySelector('.save-pdf-btn');
+      btn.disabled = true;
+      try {
+        const bytes = await buildChapterPdfBytes(ch);
+        const blob = new Blob([bytes], { type: 'application/pdf' });
+        saveAs(blob, `${chapterFilenameBase(ch)}.pdf`);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+    card.querySelector('.copy-text-btn').addEventListener('click', async () => {
+      const text = buildScriptText(ch);
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        // クリップボードAPIが使えない環境向けフォールバック
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      const flash = card.querySelector('.copied-flash');
+      flash.style.display = 'block';
+      setTimeout(() => { flash.style.display = 'none'; }, 2000);
+    });
+    card.querySelector('.save-text-btn').addEventListener('click', () => {
+      const text = buildScriptText(ch);
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      saveAs(blob, `${chapterFilenameBase(ch)}.txt`);
+    });
+    cardsContainer.appendChild(card);
+  }
+  step3.classList.remove('hidden');
+}
+
+zipAllBtn.addEventListener('click', async () => {
+  zipAllBtn.disabled = true;
+  zipAllBtn.textContent = '作成中…';
+  try {
+    const zip = new JSZip();
+    for (const ch of state.chapters) {
+      const base = chapterFilenameBase(ch);
+      const pdfBytes = await buildChapterPdfBytes(ch);
+      zip.file(`${base}.pdf`, pdfBytes);
+      zip.file(`${base}.txt`, buildScriptText(ch));
+    }
+    const blob = await zip.generateAsync({ type: 'blob' });
+    saveAs(blob, '章ごとスライド一式.zip');
+  } finally {
+    zipAllBtn.disabled = false;
+    zipAllBtn.textContent = '全章をまとめてZIPで保存';
+  }
+});
+</script>
+
+</body>
+</html>
