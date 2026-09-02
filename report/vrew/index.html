@@ -215,6 +215,62 @@
 
       <div class="stage-row" style="margin-top:16px;"><span class="label">実物の章でも再現済み：</span>2026-09-03深夜、今井のVREWアカウントで実物のINTRO章（9枚・台本2,294字）を自動投入。AI音声（波音リツ）を生成し、6分58秒のプロジェクトが完成。人が押したのはログインだけ</div>
 
+      <h3 style="margin-top:24px;">再現の記録（2026年9月3日 深夜・今井のVREWアカウント）</h3>
+      <p style="margin-top:0;"><a href="../assets/vrew_real_result_masked.jpg" target="_blank" rel="noopener"><img src="../assets/vrew_real_result_masked.jpg" alt="完成したVREWプロジェクトの画面。教材のスライドと台本の部分はぼかし済み" style="max-width:100%;border:1px solid var(--line);border-radius:8px;"></a></p>
+      <p class="source" style="margin-top:4px;">完成したプロジェクト。左上に 06:58、右上に「AI音声を作り終えました」。スライドと台本の部分は教材のためぼかしています。</p>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th>時刻</th><th>やったこと</th><th>結果</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>01:37</td>
+              <td>実物の第1章（9枚・4.4MB）をPDFで投入</td>
+              <td>VREW側で「C174 PDF読み込みエラー」</td>
+            </tr>
+            <tr>
+              <td>01:55</td>
+              <td>PDFを110dpiで画像化（850KB）して「ファイル変更」メニュー経由で差し替え</td>
+              <td>同じエラー</td>
+            </tr>
+            <tr>
+              <td>02:01</td>
+              <td>成功実績のあるテストPDFを同じ差し替え経路で投入</td>
+              <td>同じエラー → 経路そのものの問題と判明</td>
+            </tr>
+            <tr>
+              <td>02:07</td>
+              <td>ページを読み直し、新規フローからやり直し。ファイルをJSで包み直して投入</td>
+              <td>解析成功、台本入力画面へ</td>
+            </tr>
+            <tr>
+              <td>02:09</td>
+              <td>9枚に台本を自動投入（合計2,294字）→「次へ」→ AI音声（波音リツ・無料）を選び「完了」</td>
+              <td>入力完了、生成待ち</td>
+            </tr>
+            <tr>
+              <td>02:10</td>
+              <td>AI音声生成（約60秒）</td>
+              <td>6分58秒のプロジェクトが完成、端末に保存</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="stage-row" style="margin-top:16px;"><span class="label">人が押したもの：</span>Googleログインのみ（前日に1回）。声は前回の選択が残っていたので選び直し不要</div>
+      <div class="stage-row"><span class="label">今回わかったこと：</span>章PDFは軽くする／英字の中の「.」は台本側で直す／失敗したら新規フローから（詳しくは下のつまずきどころ）</div>
+
+      <p style="margin-top:16px;"><strong>りょうすけさんの環境で同じことをするには：</strong></p>
+      <ul class="plain">
+        <li>自分のVREWにGoogleでログインしておく</li>
+        <li>章PDFを軽くする（画像化）</li>
+        <li>台本を【ページN】形式で用意する</li>
+        <li>AIに「この章PDFと台本をVREWの『スライドで動画を作成』で入れて」と頼む（手順の詳細はこのページ下の技術メモ）</li>
+        <li>1本目は必ず聴く</li>
+      </ul>
+
       <p style="margin-top:16px;font-weight:700;font-size:14px;color:var(--sub);">つまずきどころ（実物の章で見つかったもの）</p>
       <ul class="plain" style="font-size:14px;color:var(--sub);">
         <li>章のPDFが大きい（目安3MB超）とVREWが「C174 PDF読み込みエラー」を返すことがある。110dpiで画像化して850KB程度に軽くしたPDFなら通った。→ 章PDFは軽量化してから入れる（軽量化の自動化は今回は未実装）</li>

@@ -1,3 +1,4 @@
 test/*.pdf
 __pycache__/
 private/
+note_draft.md
