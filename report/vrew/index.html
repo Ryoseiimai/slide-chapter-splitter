@@ -156,11 +156,62 @@
     </div>
 
     <div class="stage-card">
-      <span class="stage-num">②</span><span class="badge badge-dev">検証中</span>
+      <span class="stage-num">②</span><span class="badge badge-now">実証済み・2026-09-03</span>
       <h3>自動操作：①をブラウザ自動操作で回す</h3>
       <div class="stage-row"><span class="label">やること：</span>①と同じ画面を、ブラウザを自動で動かすAI（Claude in Chrome等）に操作させる</div>
       <div class="stage-row"><span class="label">人がやること：</span>最初のログインだけ。以降は「章の一覧を渡すと順番に投入する」形にできる見込み</div>
-      <div class="stage-row"><span class="label">今の状態：</span>今井のVREWアカウントで動作確認を進めている段階。まだ本番投入には使っていない</div>
+      <div class="stage-row"><span class="label">今の状態：</span>今井のVREWアカウントで実際に検証。PDFの投入から台本の流し込み、AI音声の生成まで自動操作だけで通り、動画のプロジェクトが1本できあがるところまで確認済み</div>
+
+      <p style="margin-top:16px;">実際に試したのは、Web版VREW（<a href="https://vrew.ai/ja/try/index.html" target="_blank" rel="noopener">vrew.ai</a>）の「新規で作成 → スライドで動画を作成」です。18ページのPDFで、下の4ステップをすべて自動操作で通しました。</p>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th>ステップ</th><th>何をしたか</th><th>自動／人</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1/4 PDFアップロード</td>
+              <td>18ページのPDFを渡して読み込ませた</td>
+              <td>自動</td>
+            </tr>
+            <tr>
+              <td>2/4 台本作成方法の選択</td>
+              <td>「AIで台本を生成」「スライドのテキストを台本として読み込む」「台本を直接作成する」の3択から「台本を直接作成する」を選択</td>
+              <td>自動</td>
+            </tr>
+            <tr>
+              <td>3/4 台本の流し込み</td>
+              <td>スライド18枚すべての台本欄に、合計684字を自動で流し込み。改行した箇所でクリップが分割される仕様（この画面の上限は30,000字）</td>
+              <td>自動</td>
+            </tr>
+            <tr>
+              <td>4/4 AI音声の生成</td>
+              <td>「AI音声を使用」をONにし、無料の声（波音リツ／VOICEVOX、クレジット表記で商用可）を選んで完了。約40秒でAI音声が生成され、1分30秒のプロジェクトが「このデバイスに保存済み」になった</td>
+              <td>声の選択は人、それ以外は自動</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p style="margin-top:16px;"><img src="../assets/vrew_result_editor.jpg" alt="自動操作で完成したVREWのエディタ画面。18クリップ・波音リツの声・字幕が入っている" style="max-width:100%;border:1px solid var(--line);border-radius:8px;"></p>
+      <p class="source" style="margin-top:4px;">完成したエディタ画面。18クリップ・波音リツ・字幕が入っている。</p>
+
+      <div class="stage-row" style="margin-top:16px;"><span class="label">残る人の操作：</span>VREWへのGoogleログイン（初回のみ）、声の選択（1本目で決める）、書き出しボタン</div>
+      <div class="stage-row"><span class="label">注意：</span>無料プランのAI音声はクレジット消費（100文字＝1クレジット、月200クレジット）。684字の台本で約7クレジット。透かしは無料プランで付く（有料プランで解除）</div>
+
+      <p style="margin-top:16px;"><strong>りょうすけさんの環境で動かすには：</strong>Codex等のAIに、ログイン済みのChromeを操作させます（Claude in Chrome、またはPlaywrightに普段使いのChromeプロファイルを持ち込む方式）。章のPDFと、章ごとの台本テキスト（【ページN】の形式で1ページ1段落）を渡せば、上の4ステップを順番に流すだけです。1章＝1プロジェクトになります。</p>
+
+      <details style="margin-top:16px;">
+        <summary style="cursor:pointer;font-weight:700;font-size:14px;color:var(--sub);">Codex向け技術メモ（実装する人向け）</summary>
+        <ul class="plain" style="margin-top:12px;font-size:14px;color:var(--sub);">
+          <li>PDFの入力欄（<code>input[type=file]</code>、accept は <code>.pdf,.ppt,.pptx</code>）は「ファイルを読み込む」ボタンを押した瞬間にDOMへ生成される。ボタンの click イベントをフックして捕まえる必要がある</li>
+          <li>PDFファイルは、CORSが許可されたURLから fetch して Blob/File化し、その input 要素の files プロパティに直接セットしたうえで change イベントを発火させる</li>
+          <li>台本欄の textarea は React 管理下にあるため、value を直接代入しても画面に反映されない。<code>Object.getOwnPropertyDescriptor</code> で取得した prototype の value setter 経由で値を入れ、そのあとに input イベントを発火させる</li>
+          <li>スライドの切り替えは、サムネイル一覧の div に対して pointerdown → mousedown → click の順でイベントを発火させないと選択状態にならない</li>
+          <li>完了ボタンが画面の見える範囲の外に出ることがあるため、事前に zoom を下げて全体を表示させておく</li>
+        </ul>
+      </details>
     </div>
 
     <div class="stage-card">
@@ -185,13 +236,13 @@
           <tr>
             <td>人が手を動かす回数</td>
             <td>3手順×章の数</td>
-            <td>最初のログインのみ（検証中）</td>
+            <td>最初のログインのみ（実証済み）</td>
             <td>ほぼゼロ（PDFと台本を渡すだけ）</td>
           </tr>
           <tr>
             <td>今すぐ使えるか</td>
             <td>使える</td>
-            <td>検証中（未確定）</td>
+            <td>使える（AIに操作させる設定が必要）</td>
             <td>使える（試作済み）</td>
           </tr>
           <tr>
